@@ -1,0 +1,51 @@
+MUSE AI - LIBRARY STORAGE AND BACKUPS
+
+First use after installing this update
+1. Stop the old server with Ctrl+C, then run: node app.js
+2. Open the SAME browser and SAME address you normally use (for example,
+   http://localhost:3000). Your existing browser library is imported once.
+3. Wait until "Saved on this computer" appears above the library.
+   Do not clear browser data before this first successful import.
+
+What is saved
+- Song cards, original creation settings, folders, ratings and Trash.
+- Your draft, library filters, demo counters and pending job snapshot.
+- Song MP3 files and saved voice WAV/JSON files are copied into backups.
+- API keys and unrelated project files are NOT included in these backups.
+
+Where it is saved
+With accounts enabled, the paths below are relative to users/<account-id>/.
+Each account has a separate set. Account sign-in data lives separately in
+accounts/accounts.sqlite; include accounts/ and users/ in external backups
+while the server is stopped. See ACCOUNTS-README.txt.
+- data/library.json: current library, with an integrity checksum.
+- backups/library/: the latest 100 saved library versions.
+- backups/library/assets/: shared backup copies of music and recordings.
+  Audio copies are retained even after an old library version expires.
+  Files may therefore accumulate over time.
+
+Restoring
+Click Backups above the song list, choose a version, then Restore backup.
+The current library is backed up before restoring the selected version.
+Restoring can recover missing audio files included in that backup.
+Wait until song generation finishes before restoring.
+If the main library file is damaged, the server attempts to recover a
+verified backup automatically and keeps a copy of the damaged file.
+
+Saving problems
+If the app says "Not saved to disk yet", keep the page open and reconnect
+or restart the server. It retries automatically.
+If two tabs make conflicting edits, the app stops the older tab from
+overwriting the newer library. Download the unsaved recovery copy before
+choosing "Use saved library". That JSON copy is for manual recovery;
+it is not an audio archive or an automatic import file.
+Never treat the demo credit counter as real billing.
+
+Protection against drive failure
+These backups are on the SAME DRIVE as the project. Periodically copy
+the project folder to another drive while the app is stopped, or at least
+copy data/, backups/library/, song MP3 files, voices/, and track-jobs.json.
+Preserve the original directory layout. Keep any API-key files private.
+
+This remains a local, single-user app. It does not provide cloud backup
+or separate user accounts. Use one tab at a time for generation.

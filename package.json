@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@huggingface/inference": "^4.13.28",
+    "replicate": "^1.4.0",
+    "synth-js": "^0.0.1"
+  }
+}

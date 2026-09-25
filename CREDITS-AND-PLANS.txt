@@ -1,0 +1,44 @@
+MUSEAI — TEST PLANS AND CREDITS
+
+Restart the server after installing: Ctrl+C, then node app.js. Refresh the browser.
+
+Each Create requests two songs. Reserve 10 app credits total; charge 5 for each
+song after its audio is saved. Confirmed failures return 5 credits per song.
+Replicate charges are separate and are not refunded by this app ledger.
+
+Free: 500 monthly credits and 10 monthly downloads.
+Pro: 5,000 monthly credits and 25 monthly downloads.
+Premium: 10,000 monthly credits and 60 monthly downloads.
+All plan changes and extra-download purchases are TEST ONLY. No payment
+details are collected and no money is charged. Prices remain undecided.
+Extra-download bundles: 1, 10 or 20 downloads. Unused extras carry over.
+
+Monthly allowances reset on the first day of the calendar month in UTC,
+when the account is next accessed. Unused monthly credits/downloads expire.
+Upgrades add only the difference from the highest credit allowance granted
+that month. Existing download usage is retained. Downgrades take effect next
+month. Existing users' saved remaining demo credits are imported once.
+Spent credits are a lifetime total; monthly downloads used reset monthly.
+Each separate Download click counts once; interrupted transfers can retry
+with the same identifier without another deduction. Browser saving cannot
+be proven by the server, so an authorized download consumes its allowance.
+
+Download allowances apply to the app's Download button. Listening necessarily
+delivers audio to the browser; these quotas are not DRM or copy protection.
+Before public launch, add payment verification, signup abuse controls,
+production hosting/security, and decide actual prices and renewal policies.
+
+Recovery: requests have durable IDs and are not automatically resubmitted
+when acceptance by Replicate is uncertain. Such jobs keep their credits
+reserved and appear in Credit history. Known predictions can be checked or
+saved again there. For an unknown prediction, the owner must review Replicate
+history; stop the server and run node review-generation.js to list the jobs.
+After reviewing a job, node review-generation.js release <job-id> releases its
+app credits without contacting Replicate. This does not refund provider fees.
+
+BACKUPS: stop the server, then copy the entire accounts and users folders to
+another safe location. accounts/credits.sqlite contains balances, plans,
+download entitlements and generation records; accounts/accounts.sqlite holds
+logins. Keep them together with users and any SQLite -wal/-shm sidecars.
+The library Backups button restores library content only; it deliberately
+does not roll back credits, purchases or download usage.

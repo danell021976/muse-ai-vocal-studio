@@ -3,34 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MuseAI - Professional Production Suite</title>
+    <title>MuseAI - Enterprise Production Suite</title>
     <style>
         :root {
             --bg-main: #060409; --bg-sidebar: #0b0914; --bg-panel: rgba(20, 16, 38, 0.45);
             --border-glow: rgba(168, 85, 247, 0.2); --accent-purple: #a855f7;
             --accent-cyan: #06b6d4; --text-main: #f8fafc; --text-muted: #94a3b8;
-            --warning-red: #ef4444;
+            --warning-red: #ef4444; --bg-input: #090714;
         }
         body { font-family: sans-serif; background: var(--bg-main); color: var(--text-main); margin: 0; padding: 0; display: flex; min-height: 100vh; overflow: hidden; }
-        .sidebar { width: 220px; background: var(--bg-sidebar); border-right: 1px solid var(--border-glow); padding: 24px 16px; display: flex; flex-direction: column; justify-content: space-between; }
-        .logo { font-size: 22px; font-weight: 800; color: #38bdf8; letter-spacing: 1px; margin-bottom: 30px; padding-left: 12px; }
-        .nav-links { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .sidebar { width: 253px; flex-shrink: 0; height: calc(100dvh - 75px); box-sizing: border-box; background: var(--bg-sidebar); border-right: 1px solid var(--border-glow); padding: 16px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+        .sidebar > * { flex-shrink: 0; }
+        .sidebar .logo { margin-bottom: 0; }
+        .sidebar .account-panel { margin-bottom: 0; padding: 10px; }
+        .sidebar .token-wallet { margin-bottom: 0; padding: 10px; }
+        .plan-controls { display: flex; flex-direction: column; gap: 8px; }
+        .plan-summary { display: flex; flex-wrap: wrap; gap: 6px; }
+        .plan-badge { display: inline-block; padding: 7px 9px; border-radius: 8px; border: 1px solid rgba(6,182,212,.25); background: rgba(6,182,212,.08); color: var(--accent-cyan); font-size: 11px; font-weight: 600; cursor: default; }
+        .plan-actions { display: grid; gap: 6px; }
+        .plan-actions .filter-btn { padding: 9px 10px; text-align: left; border-color: var(--border-glow); }
+        .plan-actions .filter-btn:hover { background: rgba(168,85,247,.18); border-color: var(--accent-purple); }
+        .plan-actions .filter-btn:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 2px; }
+        .logo { font-size: 22px; font-weight: 800; color: #38bdf8; letter-spacing: 1px; margin-bottom: 20px; padding-left: 12px; }
+        .nav-links { display: flex; flex-direction: column; gap: 8px; flex: 0 0 auto; }
         .nav-item { padding: 12px 16px; border-radius: 8px; color: var(--text-muted); text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 12px; font-weight: 500; cursor: pointer; }
         .nav-item.active, .nav-item:hover { background: rgba(168, 85, 247, 0.12); color: var(--text-main); border-left: 3px solid var(--accent-purple); }
+        .sidebar .workspace-section { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; margin-top: 0; display: flex; flex-direction: column; gap: 10px; flex: 1 0 140px; min-height: 140px; }
+        .workspace-header { display: flex; justify-content: space-between; align-items: center; padding: 0 12px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .add-ws-btn { background: transparent; border: none; color: var(--accent-cyan); font-size: 14px; font-weight: bold; cursor: pointer; }
+        .ws-list { display: flex; flex-direction: column; gap: 4px; flex: 1 1 0; min-height: 0; overflow-y: auto; scrollbar-gutter: stable; }
+        .ws-list .ws-item { flex-shrink: 0; overflow-wrap: anywhere; }
+        .ws-item { padding: 8px 12px; font-size: 13px; color: var(--text-muted); border-radius: 6px; cursor: pointer; }
+        .ws-item.active, .ws-item:hover { background: rgba(6, 182, 212, 0.08); color: var(--text-main); }
+        .token-wallet { background: rgba(6, 182, 212, 0.05); border: 1px solid rgba(6, 182, 212, 0.15); border-radius: 12px; padding: 14px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 6px; }
+        .token-row { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; }
         .user-badge { padding: 12px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
         .main-workspace { flex: 1; display: flex; height: 100vh; }
-        .creator-column { width: 360px; min-width: 360px; background: rgba(13, 10, 26, 0.4); border-right: 1px solid var(--border-glow); padding: 30px 24px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; box-sizing: border-box; }
-        .control-group { display: flex; flex-direction: column; gap: 8px; }
+        .creator-column { width: 440px; min-width: 440px; background: rgba(13, 10, 26, 0.4); border-right: 1px solid var(--border-glow); padding: 25px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; box-sizing: border-box; }
+        .control-group { display: flex; flex-direction: column; gap: 6px; }
         .label-row { display: flex; justify-content: space-between; align-items: center; }
-        label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #cbd5e1; }
-        .title-warning { font-size: 10px; color: var(--warning-red); font-weight: bold; display: none; text-transform: uppercase; letter-spacing: 0.5px; }
-        input, textarea { width: 100%; padding: 12px; background: #090714; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; color: #fff; font-size: 13px; box-sizing: border-box; font-family: inherit; resize: none; transition: border-color 0.2s; }
+        label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #cbd5e1; display: flex; align-items: center; gap: 6px; }
+        .title-warning { font-size: 10px; color: var(--warning-red); font-weight: bold; display: none; }
+        input { width: 100%; padding: 12px 14px; background: var(--bg-input); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; color: #fff; font-size: 13px; box-sizing: border-box; }
+        textarea.large-input { width: 100%; padding: 14px; background: var(--bg-input); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; color: #fff; font-size: 13px; box-sizing: border-box; font-family: inherit; resize: none; }
         input:focus, textarea:focus { outline: none; border-color: var(--accent-purple); }
         input.input-error { border-color: var(--warning-red); background: rgba(239, 68, 68, 0.02); }
-        .tags-row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .toggle-row { display: grid; grid-template-columns: repeat(3, 1fr); background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px; gap: 4px; border: 1px solid rgba(255,255,255,0.05); }
+        .toggle-btn { background: transparent; border: none; color: var(--text-muted); padding: 8px; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
+        .toggle-btn.active { background: var(--accent-purple); color: #fff; }
+        .info-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; background: rgba(255,255,255,0.1); border-radius: 50%; font-size: 9px; color: var(--text-muted); cursor: help; position: relative; }
+        .info-tip::after { content: attr(data-tip); position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #16122b; border: 1px solid var(--accent-cyan); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 11px; width: 200px; text-transform: none; display: none; z-index: 1000; }
+        .info-tip:hover::after { display: block; }
+        .tags-row { display: flex; gap: 6px; flex-wrap: wrap; max-height: 55px; overflow-y: auto; }
         .preset-tag { background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.15); padding: 4px 10px; border-radius: 15px; font-size: 11px; color: #c084fc; cursor: pointer; }
-        .action-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent-purple) 0%, #7e22ce 100%); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(168,85,247,0.2); }
-        .action-btn:disabled { background: #1e1b29; color: #475569; cursor: not-allowed; box-shadow: none; }
         .library-column { flex: 1; padding: 30px 40px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; box-sizing: border-box; }
         .lib-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
         .lib-tabs { display: flex; gap: 20px; }
@@ -40,17 +65,28 @@
         .search-box { flex: 1; }
         .filter-btn { background: #16122b; border: 1px solid rgba(255,255,255,0.05); color: var(--text-main); padding: 10px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; }
         .tracks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-        .track-card { background: var(--bg-panel); border: 1px solid var(--border-glow); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px; cursor: pointer; transition: all 0.2s; }
+        .track-card { background: var(--bg-panel); border: 1px solid var(--border-glow); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px; cursor: pointer; }
+        .track-card:hover { border-color: var(--accent-cyan); }
+        .track-card.is-cooking { border-color: var(--accent-purple); animation: cardGlowPulse 1.5s ease-in-out infinite alternate; cursor: wait; opacity: 0.6; }
+        @keyframes cardGlowPulse { from { box-shadow: 0 0 5px rgba(168,85,247,0.1); } to { box-shadow: 0 0 15px rgba(168,85,247,0.4); } }
         .card-wave-art { height: 45px; background: linear-gradient(90deg, rgba(6,182,212,0.15) 0%, rgba(168, 85, 247, 0.15) 100%); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
         .card-wave-bars { display: flex; gap: 3px; }
         .wave-bar { width: 3px; height: 16px; background: var(--accent-purple); border-radius: 2px; }
+        .track-card.is-cooking .wave-bar { background: #475569; }
         .card-details { display: flex; flex-direction: column; gap: 4px; }
         .card-title { font-size: 14px; font-weight: 600; color: #fff; }
         .card-style { font-size: 11px; color: var(--text-muted); }
-        .card-actions { display: flex; gap: 8px; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
-        .action-icon-btn { flex: 1; padding: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; transition: all 0.2s; }
+        .mastering-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 4px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2); color: var(--accent-cyan); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; width: fit-content; margin-top: 4px; animation: badgePulseAlpha 1.2s ease-in-out infinite alternate; }
+        @keyframes badgePulseAlpha { from { opacity: 0.5; } to { opacity: 1; } }
+        .card-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
+        .btn-row-split { display: flex; gap: 6px; }
+        .action-icon-btn { flex: 1; padding: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; }
         .action-icon-btn:hover { background: rgba(6, 182, 212, 0.15); color: #fff; border-color: var(--accent-cyan); }
-        .action-icon-btn.lib-added { background: rgba(168, 85, 247, 0.2); color: #fff; border-color: var(--accent-purple); }
+        .track-card > .btn-delete { flex: none; width: 100%; padding: 10px; color: #fca5a5; border-color: rgba(239,68,68,.4); background: rgba(239,68,68,.08); }
+        .library-column { padding-bottom: 110px; }
+        .action-icon-btn.btn-delete:hover { background: rgba(239, 64, 64, 0.2); color: #ef4444; border-color: var(--warning-red); }
+        .action-icon-btn.is-hidden { display: none; }
+        .ws-selector-dropdown { width: 100%; padding: 6px; background: #090714; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--text-muted); font-size: 11px; outline: none; cursor: pointer; }
         .player-bar { position: absolute; bottom: 0; left: 0; right: 0; background: #0d0a1a; border-top: 1px solid var(--border-glow); padding: 16px 40px; display: flex; align-items: center; gap: 30px; height: 75px; box-sizing: border-box; }
         .player-info { width: 200px; display: flex; flex-direction: column; gap: 4px; }
         .player-title { font-size: 13px; font-weight: 600; color: #fff; }
@@ -60,20 +96,180 @@
         #status-info { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px; }
         .spinner { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: var(--accent-cyan); animation: spin 1s linear infinite; margin: 10px auto 0 auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .action-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--accent-purple) 0%, #7e22ce 100%); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(168,85,247,0.2); transition: all 0.2s; }
+        .action-btn:hover { filter: brightness(1.1); }
+        .action-btn:disabled { background: #1e1b29; color: #475569; cursor: not-allowed; box-shadow: none; }
+        .input-help { margin: 4px 0; font-size: 12px; line-height: 1.5; color: var(--text-muted); }
+        .input-help.over-limit { color: #fca5a5; }
+        .main-workspace { height: calc(100vh - 75px); height: calc(100dvh - 75px); min-height: 0; }
+        .creator-column { padding: 0; gap: 0; overflow: hidden; min-height: 0; }
+        .creator-fields { flex: 1; min-height: 0; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 18px; }
+        .creator-fields > .control-group { flex-shrink: 0; }
+        .creator-actions { flex-shrink: 0; padding: 14px 25px; background: #0d0a1a; border-top: 1px solid var(--border-glow); }
+        .creator-actions .action-btn { min-height: 48px; }
+        .creator-actions .action-btn:disabled { color: #cbd5e1; }
+        .creator-actions .input-help { font-size: 11px; }
+        #createWarning:empty { display: none; }
+
+        /* Library list: saved cards and new tracks share the same row layout. */
+        .library-column { min-width: 0; container-type: inline-size; padding: 24px; }
+        .tracks-grid { display: flex; flex-direction: column; gap: 10px; }
+        .track-card { flex-direction: row; align-items: center; gap: 14px; padding: 14px; border-radius: 10px; flex-shrink: 0; }
+        .card-wave-art { width: 44px; height: 44px; flex: 0 0 44px; }
+        .card-details { flex: 1 1 160px; min-width: 0; }
+        .card-title, .card-style { overflow-wrap: anywhere; }
+        .card-title-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; min-width:0; }
+        .card-title-row .card-title { min-width:0; }
+        .card-title-row .btn-rename { flex:0 0 auto; padding:6px 10px; }
+        .card-actions { flex: 0 1 250px; min-width: 0; margin: 0; padding: 0; border: 0; gap: 6px; }
+        .card-actions.is-hidden { display: none; }
+        .btn-row-split { flex-wrap: wrap; }
+        .btn-row-split .action-icon-btn { white-space: nowrap; }
+        .track-card > .btn-delete { flex: 0 0 auto; width: auto; max-width: 100px; margin: 0; padding: 9px; }
+        @container (max-width: 640px) {
+            .track-card { flex-wrap: wrap; gap: 10px; }
+            .card-details { flex-basis: calc(100% - 150px); }
+            .card-actions { order: 4; flex: 1 0 100%; display: flex; flex-direction: row; align-items: center; flex-wrap: wrap; }
+            .card-actions .ws-selector-dropdown { flex: 1 1 150px; width: auto; }
+            .card-actions .btn-row-split { flex: 2 1 220px; }
+        }
+        .search-filter-row { flex-wrap: wrap; gap: 10px; }
+        .search-box { flex: 1 1 180px; min-width: 0; }
+        .library-filters { display: flex; flex-wrap: wrap; gap: 14px; align-items: end; background: var(--bg-panel); border: 1px solid var(--border-glow); padding: 14px; border-radius: 10px; }
+        .library-filters[hidden], .library-empty[hidden] { display: none; }
+        .library-filters label { flex-direction: column; align-items: flex-start; gap: 8px; }
+        .library-filters select { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-glow); border-radius: 6px; padding: 9px; font: inherit; }
+
+        .library-empty { padding: 28px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border-glow); border-radius: 10px; }
+        #trackDetailsDialog { width: min(620px, calc(100vw - 48px)); max-height: 85vh; overflow-y: auto; box-sizing: border-box; background: #100c1c; color: var(--text-main); border: 1px solid var(--border-glow); border-radius: 16px; padding: 24px; }
+        #trackDetailsDialog::backdrop { background: rgba(0,0,0,.7); }
+        .details-header, .details-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .details-header h2 { margin: 0; font-size: 20px; overflow-wrap: anywhere; }
+        #trackDetailsDialog dt { margin-top: 18px; color: var(--text-muted); font-size: 12px; }
+        #trackDetailsDialog dd { margin: 6px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; font-size: 14px; }
+        .track-card > .btn-details { flex: 0 0 auto; padding: 9px; }
+        @container (max-width: 640px) { .track-card > .btn-details { order: 3; } }
+        .track-card > .btn-play { flex: 0 0 auto; padding: 10px 12px; color: white; background: #7135b5; border-color: var(--accent-purple); }
+        .track-card > .btn-play:disabled { background: #211a30; color: #94a3b8; cursor: not-allowed; }
+        .card-wave-art.track-cover { width: 56px; height: 56px; flex-basis: 56px; overflow: hidden; border-radius: 8px; background: #171128; }
+        .track-cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+        .track-cover { position: relative; }
+        .track-equalizer { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; gap: 3px; background: rgba(6,4,9,.6); pointer-events: none; }
+        .is-playing .track-equalizer { display: flex; }
+        .track-equalizer i { width: 4px; height: 26px; border-radius: 2px; background: var(--accent-cyan); transform-origin: center; animation: equalizerBounce .8s ease-in-out infinite alternate; }
+        .track-equalizer i:nth-child(2) { animation-delay: -.3s; background: var(--accent-purple); }
+        .track-equalizer i:nth-child(3) { animation-delay: -.6s; }
+        .track-equalizer i:nth-child(4) { animation-delay: -.15s; background: var(--accent-purple); }
+        .track-equalizer i:nth-child(5) { animation-delay: -.45s; }
+        @keyframes equalizerBounce { from { transform: scaleY(.2); } to { transform: scaleY(1); } }
+        @media (prefers-reduced-motion: reduce) { .track-equalizer i { animation: none; } .track-equalizer i:nth-child(even) { transform: scaleY(.5); } }
+        .vocal-options { grid-template-columns:repeat(2,1fr); }
+        .account-panel { flex-shrink:0; margin-bottom:12px; padding:14px; border:1px solid rgba(6,182,212,.35); background:rgba(6,182,212,.06); }
+        .account-caption { display:block; color:var(--text-muted); font-size:11px; margin-bottom:5px; }
+        #accountName { display:block; font-size:16px; color:var(--accent-cyan); overflow-wrap:anywhere; }
+        .account-panel .storage-actions { margin-top:12px; }
+        .account-panel .filter-btn { padding:7px 10px; font-size:12px; }
+        .track-rating { display: flex; flex: 0 0 auto; gap: 5px; }
+        .track-rating .rating-btn { padding: 8px; white-space: nowrap; }
+        .rating-like.is-selected { color: #a7f3d0; background: #064e3b; border-color: #34d399; }
+        .rating-dislike.is-selected { color: #fecaca; background: #641b25; border-color: #fb7185; }
+        @container (max-width: 900px) {
+            .track-card { flex-wrap: wrap; }
+            .track-rating { order: 5; }
+        }
+        .bulk-actions { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+        .bulk-actions label { text-transform:none; }
+        .bulk-actions input, .track-select { width:18px; height:18px; padding:0; flex:0 0 18px; accent-color:var(--accent-purple); cursor:pointer; }
+        .bulk-actions button:disabled { opacity:.45; cursor:not-allowed; }
+        .track-card.is-selected { border-color:var(--accent-purple); background:#20132f; }
+        .track-card[data-trashed] .card-actions { display:none; }
+        #libraryLoading { position:fixed; inset:0; z-index:3000; display:flex; align-items:center; justify-content:center; background:#080610f5; }
+        #libraryLoading[hidden] { display:none; }
+        .library-loading-card { max-width:560px; padding:30px; line-height:1.6; }
+        #libraryBackupDialog { max-width:560px; background:#100c1c; color:var(--text-main); border:1px solid var(--border-glow); border-radius:14px; padding:24px; }
+        #libraryBackupDialog::backdrop { background:#000b; }
+        #libraryBackupChoice { width:100%; margin:16px 0; }
+        .storage-actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+        #authScreen { position:fixed; inset:0; z-index:4000; display:grid; place-items:center; background:#080610; overflow:auto; padding:24px; }
+        #authScreen[hidden], #authForm[hidden], #authModeRow[hidden], #setupCodeRow[hidden], #recoveryCodeRow[hidden], #recoveryResult[hidden] { display:none; }
+        .auth-card { width:min(440px,100%); line-height:1.5; }
+        .auth-card form { display:flex; flex-direction:column; gap:14px; }
+        .auth-card label { display:flex; align-items:stretch; flex-direction:column; }
+        .auth-card input { margin-top:5px; }
+        #authError { color:#fca5a5; }
+        #accountDialog, #renameSongDialog { max-width:440px; background:#100c1c; color:white; border:1px solid var(--border-glow); padding:24px; border-radius:12px; }
+        #renameSongDialog { width:calc(100vw - 64px); box-sizing:border-box; }
+        #renameSongDialog form { display:flex; flex-direction:column; gap:14px; }
+        #accountDialog form { display:flex; flex-direction:column; gap:12px; }
     </style>
 </head>
 <body>
-<div class="sidebar">
+<div id="authScreen"><div class="auth-card">
+    <h1 id="authHeading">Your MuseAI account</h1><p id="authHelp">Loading account…</p>
+    <div id="authModeRow"><label for="authMode">Account action</label><select id="authMode" class="filter-btn" onchange="MuseAuth.setMode(this.value)"><option value="login">Sign in</option><option value="register">Create account</option><option value="recover">Forgot password</option></select></div>
+    <form id="authForm" onsubmit="MuseAuth.submit(event)">
+        <label>Username<input id="authUsername" autocomplete="username" required minlength="3" maxlength="32" pattern="[A-Za-z0-9_]{3,32}" placeholder="Letters, numbers or underscores"></label>
+        <label>Password<input id="authPassword" type="password" autocomplete="current-password" required minlength="12" maxlength="128" placeholder="At least 12 characters"></label>
+        <label id="setupCodeRow" hidden>Setup code<input id="authSetupCode" autocomplete="off" placeholder="Shown in the server terminal"></label>
+        <label id="recoveryCodeRow" hidden>Recovery code<input id="authRecoveryCode" autocomplete="off" placeholder="The code saved when you created your account"></label>
+        <button id="authSubmit" class="action-btn" type="submit">Sign in</button>
+    </form>
+    <p id="authError" role="alert"></p>
+    <div id="recoveryResult" hidden><h2>Save your recovery code</h2><p>Keep this code somewhere private. It lets you reset your password. It is shown only once; a password reset gives you a new code.</p>
+        <label for="newRecoveryCode">Recovery code</label><textarea id="newRecoveryCode" class="large-input" readonly rows="3"></textarea>
+        <button class="action-btn" type="button" onclick="location.reload()">I saved my code — open my library</button>
+    </div>
+    <p class="input-help">Local accounts on this computer. This app is not yet a public hosted service.</p>
+</div></div>
+<div id="libraryLoading" role="status"><div class="library-loading-card">
+    <h2>Library storage</h2><p id="libraryLoadingText">Loading your saved library…</p>
+    <button id="retryLibraryLoad" class="filter-btn" type="button" onclick="location.reload()" hidden>Try again</button>
+    <button id="downloadUnsavedLibrary" class="filter-btn" type="button" onclick="libraryStorage.downloadPending()" hidden>Download unsaved copy</button>
+    <button id="reloadSavedLibrary" class="filter-btn" type="button" onclick="libraryStorage.useSaved()" hidden>Use saved library</button>
+</div></div>
+<div class="sidebar" inert>
     <div class="logo">MUSE AI</div>
+    <section class="user-badge account-panel" aria-label="Signed-in account">
+        <span class="account-caption">Signed in as</span>
+        <strong id="accountName" aria-live="polite">Loading account…</strong>
+        <div class="storage-actions">
+            <button class="filter-btn" type="button" onclick="document.getElementById('accountDialog').showModal()">Reset Password</button>
+            <button class="filter-btn" type="button" onclick="MuseAuth.logout()">Sign out</button>
+        </div>
+    </section>
+    <div class="token-wallet">
+        <div class="token-row" style="color: var(--accent-cyan);">
+            <span>CREDITS AVAILABLE:</span>
+            <span id="tkAvailable">—</span>
+        </div>
+        <div class="token-row" style="color: var(--text-muted); font-size:11px;">
+            <span>CREDITS SPENT:</span>
+            <span id="tkSpent">—</span>
+        </div>
+    </div>
+    <div class="plan-controls">
+        <div id="planSummary" class="plan-summary" aria-live="polite"><span id="planNameBadge" class="plan-badge">Loading plan…</span><span id="downloadsBadge" class="plan-badge">— downloads left</span></div>
+        <div class="plan-actions"><button class="filter-btn" type="button" onclick="showPlans()">Plans &amp; downloads</button><button class="filter-btn" type="button" onclick="showCreditHistory()">Credit history</button></div>
+    </div>
     <div class="nav-links">
         <a href="#" class="nav-item active">➕ Create Studio</a>
-        <a href="#" class="nav-item">🧭 Explore Tracks</a>
-        <a href="#" class="nav-item" onclick="filterToWorkspace()">📚 My Workspace</a>
+
     </div>
-    <div class="user-badge"><div style="font-weight:600; color:#fff;">Developer Studio</div><div style="color:var(--text-muted); font-size:11px; margin-top:2px;">Plan: Sandbox Unlimited</div></div>
+    <div class="workspace-section">
+        <div class="workspace-header">
+            <span>Workspaces</span>
+            <button class="add-ws-btn" onclick="addNewWorkspaceFolder()">＋</button>
+        </div>
+        <div class="ws-list" id="sidebarWorkspaceList">
+            <div class="ws-item active" id="ws-folder-default" onclick="selectWorkspaceFolder('default')">📁 Main Library</div>
+        </div>
+    </div>
+    <button id="trashNav" class="filter-btn" type="button" onclick="selectWorkspaceFolder('__trash')">🗑 Trash (0)</button>
+
 </div>
-<div class="main-workspace">
+<div class="main-workspace" inert>
     <div class="creator-column">
+        <div class="creator-fields">
         <div class="control-group">
             <div class="label-row">
                 <label>Song Title</label>
@@ -82,199 +278,1227 @@
             <input type="text" id="trackTitle" placeholder="Enter title to unlock studio..." oninput="validateFormTitle()">
         </div>
         <div class="control-group">
-            <label>Track Style & Aesthetics</label>
-            <input type="text" id="prompt" value="Dark atmospheric techno with male vocals, slow chill progression.">
-            <div class="tags-row">
-                <span class="preset-tag" onclick="document.getElementById('prompt').value='Synthwave, 80s bass, electronic drums'">#Synthwave</span>
-                <span class="preset-tag" onclick="document.getElementById('prompt').value='Chill lofi hiphop beats, saxophone jazz'">#LofiJazz</span>
+            <label>Vocal Profile Delivery</label>
+            <div class="toggle-row vocal-options">
+                <button class="toggle-btn active" id="vMale" onclick="setVocalProfile('male')">Male</button>
+                <button class="toggle-btn" id="vFemale" onclick="setVocalProfile('female')">Female</button>
             </div>
         </div>
         <div class="control-group">
-            <label>Vocal Lyrics Engine Input</label>
-            <textarea id="lyrics" rows="6">[Outro]&#10;[M] Ooh...&#10;The room goes still&#10;The glass runs dry&#10;I'm left with you&#10;And a blacked-out sky</textarea>
+            <label for="prompt">Track Style & Aesthetics</label>
+            <textarea id="prompt" aria-describedby="promptCount" class="large-input" rows="3" placeholder="Describe genres, instruments, tempos, vibe..."></textarea>
+            <p id="promptCount" class="input-help" aria-live="polite"></p>
+            <div class="tags-row">
+                <span class="preset-tag" onclick="appendStyle('Synthwave, 80s bass, retro electronic drums')">#Synthwave</span>
+                <span class="preset-tag" onclick="appendStyle('Chill lofi hiphop beats, smooth saxophone jazz')">#LofiJazz</span>
+                <span class="preset-tag" onclick="appendStyle('Heavy metal rock riff, driving distortion')">#HeavyMetal</span>
+                <span class="preset-tag" onclick="appendStyle('Futuristic cyberpunk techno, deep sub-bass')">#Cyberpunk</span>
+            </div>
         </div>
-        <button id="genBtn" class="action-btn" onclick="generateMusic()">Create Track Array</button>
-        <div id="status-info">Ready to arrange matrix.</div>
+        <div class="control-group">
+            <label>Exclusions / Anti-Prompts
+                <span class="info-tip" data-tip="Type properties or instrumentation profiles you want the AI engine to completely avoid generating (e.g., vocal distortion, acoustic piano).">[?]</span>
+            </label>
+            <input type="text" id="exclusions" aria-describedby="combinedPromptCount" placeholder="e.g., low quality, distortion, piano...">
+            <p id="combinedPromptCount" class="input-help" aria-live="polite"></p>
+        </div>
+        <div class="control-group">
+            <label>Arrangement
+                <span class="info-tip" data-tip="Guides the number of musical layers and how the song develops. All options use the same model and credits; results vary.">[?]</span>
+            </label>
+            <div class="toggle-row">
+                <button class="toggle-btn active" id="tierSimple" title="Few instruments, sparse accompaniment, focus on the lead vocal." onclick="setTier('simple')">Simple</button>
+                <button class="toggle-btn" id="tierPro" title="Moderate instrumental layers, supporting harmonies and clear verse/chorus contrast." onclick="setTier('pro')">Balanced</button>
+                <button class="toggle-btn" id="tierMaster" title="Fuller instrumental layers, complementary melodies and evolving sections." onclick="setTier('master')">Rich</button>
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="lyrics">Song Lyrics</label>
+            <textarea id="lyrics" aria-describedby="lyricsCount songLimits" class="large-input" rows="5" placeholder="Write verses or poetry..."></textarea>
+            <p id="lyricsCount" class="input-help" aria-live="polite"></p>
+            <p id="songLimits" class="input-help">10–3,500 lyric characters, including spaces, line breaks, and [Verse] / [Chorus] labels. Each variant is generated as one song. Maximum supported duration: 6 minutes; actual length varies.</p>
+        </div>
+        </div>
+        <div class="creator-actions">
+        <button id="genBtn" class="action-btn" aria-describedby="createWarning" onclick="generateMusic()">Create</button>
+        <p id="createWarning" class="input-help" role="status"></p>
+        <p class="input-help">Your song is being created</p>
+        <div id="status-info" role="status">Ready to create your songs.</div>
         <div id="loader" class="spinner"></div>
+        </div>
     </div>
     <div class="library-column">
-        <div class="lib-header"><div class="lib-tabs"><span class="lib-tab active" id="tabAll" onclick="showAllTracks()">All Tracks</span><span class="lib-tab" id="tabWork" onclick="filterToWorkspace()">My Workspace / Library</span></div></div>
-        <div class="search-filter-row"><div class="search-box"><input type="text" placeholder="Search master index..."></div><button class="filter-btn">Filters (0) ▾</button><button class="filter-btn">Sorting ▾</button></div>
+        <div class="lib-header"><div class="lib-tabs"><span class="lib-tab active" id="tabAll" onclick="showAllTracks()">All Tracks</span></div></div>
+        <div class="storage-actions"><span id="librarySaveStatus" class="input-help" role="status" aria-live="polite">Loading library…</span><button class="filter-btn" type="button" onclick="libraryStorage.openBackups()">Backups</button></div>
+        <div class="search-filter-row">
+            <div class="search-box"><input id="librarySearch" type="search" aria-label="Search tracks by title or style" placeholder="Search title or style…"></div>
+            <button id="filterToggle" class="filter-btn" type="button" aria-expanded="false" aria-controls="libraryFilters">Filters (0) ▾</button>
+            <select id="librarySort" class="filter-btn" aria-label="Sort tracks">
+                <option value="newest">Newest first</option><option value="oldest">Oldest first</option>
+                <option value="az">Title A–Z</option><option value="za">Title Z–A</option>
+            </select>
+        </div>
+        <div id="libraryFilters" class="library-filters" hidden>
+            <label>Status <select id="libraryStatus"><option value="all">All statuses</option><option value="ready">Ready to play</option><option value="creating">Creating</option><option value="failed">Failed</option><option value="unknown">Unavailable / older unfinished</option></select></label>
+            <label>Rating <select id="libraryRating"><option value="all">All ratings</option><option value="like">Liked</option><option value="dislike">Disliked</option><option value="unrated">Not rated</option></select></label>
+            <label>Variant <select id="libraryVariant"><option value="all">All variants</option><option value="A">Variant A</option><option value="B">Variant B</option></select></label>
+
+            <button id="clearLibraryFilters" class="filter-btn" type="button">Clear search &amp; filters</button>
+        </div>
+        <div class="bulk-actions">
+            <label><input id="selectVisibleTracks" type="checkbox" onchange="selectVisibleTracks(this.checked)">Select shown</label>
+            <span id="selectionCount" class="input-help" role="status">0 selected</span>
+            <button id="bulkTrackAction" class="filter-btn" type="button" onclick="applyBulkTrackAction()" disabled>Move to Trash</button>
+        </div>
+        <p id="trashStatus" class="input-help" role="status" aria-live="polite"></p>
+        <p id="libraryResults" class="input-help" role="status" aria-live="polite"></p>
+        <div id="libraryEmpty" class="library-empty" hidden>No matching tracks. Clear your search or filters, or select All Tracks.</div>
         <div id="tracksGrid" class="tracks-grid"></div>
     </div>
 </div>
-<div class="player-bar">
+<div class="player-bar" inert>
     <div class="player-info"><div id="pTitle" class="player-title">No Audio Loaded</div><div id="pStatus" class="player-status">System Standby</div></div>
-    <div class="audio-wrapper"><audio id="audioPlayer" controls></audio></div>
+    <div class="audio-wrapper"><audio id="audioPlayer" controls controlsList="nodownload"></audio></div>
 </div>
+<dialog id="trackDetailsDialog" aria-labelledby="detailsTitle">
+    <div class="details-header"><h2 id="detailsTitle">Track details</h2><button type="button" class="filter-btn" onclick="document.getElementById('trackDetailsDialog').close()" aria-label="Close track details">Close</button></div>
+    <p id="detailsNotice" class="input-help"></p>
+    <dl>
+        <dt>Style</dt><dd id="detailsStyle"></dd>
+        <dt>Lyrics</dt><dd id="detailsLyrics"></dd>
+        <dt>Exclusions</dt><dd id="detailsExclusions"></dd>
+        <dt>Vocal selection</dt><dd id="detailsVocal"></dd>
+        <dt>Arrangement selection</dt><dd id="detailsTier"></dd>
+        <dt>Prompt submitted to the model</dt><dd id="detailsSubmitted"></dd>
+    </dl>
+    <div class="details-footer"><p class="input-help">Copies settings into the form. No song is generated until you click Create.</p><button id="reuseTrackSettings" type="button" class="filter-btn" onclick="reuseTrackSettings()">Use these settings</button></div>
+</dialog>
+<dialog id="libraryBackupDialog" aria-labelledby="libraryBackupTitle">
+    <h2 id="libraryBackupTitle">Library backups</h2>
+    <p id="libraryBackupNotice" class="input-help"></p>
+    <label for="libraryBackupChoice">Choose a saved version</label>
+    <select id="libraryBackupChoice" class="filter-btn"></select>
+    <p class="input-help">Includes your library, song files and saved voices. Backups stay on this computer; copy the project folder to another drive for protection against drive failure.</p>
+    <div class="storage-actions"><button id="restoreLibraryBackup" class="filter-btn" type="button" onclick="libraryStorage.restoreBackup()">Restore backup</button><button class="filter-btn" type="button" onclick="document.getElementById('libraryBackupDialog').close()">Close</button></div>
+</dialog>
+<dialog id="accountDialog" aria-labelledby="accountTitle"><h2 id="accountTitle">Change password</h2>
+<form onsubmit="MuseAuth.changePassword(event)"><label>Current password<input type="password" id="currentPassword" autocomplete="current-password" required maxlength="128"></label><label>New password<input type="password" id="newPassword" autocomplete="new-password" required minlength="12" maxlength="128"></label><button id="passwordSubmit" class="filter-btn" type="submit">Change password</button></form><p id="passwordNotice" role="status"></p><button class="filter-btn" onclick="document.getElementById('accountDialog').close()">Close</button></dialog>
+<script src="/auth-client.js"></script>
+<script src="/library-client.js"></script>
+<dialog id="renameSongDialog" aria-labelledby="renameSongHeading">
+    <form onsubmit="saveSongRename(event)">
+        <h2 id="renameSongHeading">Rename song</h2>
+        <label for="renameSongInput">Song title</label>
+        <input id="renameSongInput" type="text" required aria-describedby="renameSongError" autocomplete="off">
+        <p id="renameSongError" role="alert" style="color:var(--warning-red);margin:0"></p>
+        <div class="storage-actions"><button class="filter-btn" type="submit">Save title</button><button class="filter-btn" type="button" onclick="document.getElementById('renameSongDialog').close()">Cancel</button></div>
+    </form>
+</dialog>
 <script>
-    let workspaceList = [];
+    let customFolders = ['default'];
+    let activeFolderView = 'default';
+    const selectedTrackIds = new Set();
+    let currentVocalProfile = 'male';
+    let currentTier = 'simple';
+    let tokensAvailable = 0;
+    let tokensSpent = 0;
+    let generationBusy = false;
+    let pendingBatch = null;
+    const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-    function validateFormTitle() {
-        const titleField = document.getElementById('trackTitle');
-        const warnText = document.getElementById('titleWarningText');
-        const btn = document.getElementById('genBtn');
-        
-        if (titleField.value.trim() === "") {
-            titleField.classList.add('input-error');
-            warnText.style.display = 'block';
-            btn.disabled = true;
-            btn.innerText = "Please Enter Song Title First";
-        } else {
-            titleField.classList.remove('input-error');
-            warnText.style.display = 'none';
-            btn.disabled = false;
-            btn.innerText = "Create Track Array";
+    function addNewWorkspaceFolder() {
+        const folderName = prompt("📁 Enter name for new Workspace Folder:");
+        if (!folderName || folderName.trim() === "") return;
+        const cleanId = "folder-" + Date.now();
+        customFolders.push(cleanId);
+        const listContainer = document.getElementById('sidebarWorkspaceList');
+        const newItem = document.createElement('div');
+        newItem.className = 'ws-item'; newItem.id = "ws-item-" + cleanId;
+        newItem.setAttribute('data-folder-id', cleanId); newItem.setAttribute('data-folder-name', folderName.trim());
+        newItem.innerText = "📁 " + folderName.trim(); newItem.onclick = function() { selectWorkspaceFolder(cleanId); };
+        listContainer.appendChild(newItem);
+        updateAllCardDropdownMenus(); saveCurrentLibraryState();
+    }
+
+    function selectWorkspaceFolder(folderId) {
+        selectedTrackIds.clear();
+        activeFolderView = folderId;
+        document.querySelectorAll('.ws-item').forEach(el => {
+            el.classList.toggle('active', el.id === "ws-item-" + folderId || (folderId === 'default' && el.id === 'ws-folder-default'));
+        });
+        filterTracksByActiveFolder();
+        saveLibraryView();
+    }
+
+    function trackDetails(card) {
+        const title = card.getAttribute('data-track-title') || card.querySelector('.card-title')?.textContent || '';
+        const style = card.getAttribute('data-track-style') || card.querySelector('.card-style')?.textContent || '';
+        // Existing cards already include their creation timestamp in IDs or filenames.
+        const stamp = (card.id + ' ' + (card.getAttribute('data-audio-src') || '')).match(/\b\d{13}\b/);
+        const created = Number(card.getAttribute('data-created-at')) || (stamp ? Number(stamp[0]) : 0);
+        const variant = card.getAttribute('data-variant') || title.match(/\(Variant ([AB])\)/i)?.[1]?.toUpperCase() || '';
+        const status = card.hasAttribute('data-failed') ? 'failed' :
+            card.classList.contains('is-cooking') ? (card.hasAttribute('data-unrecoverable') ? 'unknown' : 'creating') :
+            card.getAttribute('data-audio-src') ? 'ready' : 'unknown';
+        return {card, title, style, created, variant, status, folder: card.getAttribute('data-assigned-folder') || 'default'};
+    }
+
+    function filterTracksByActiveFolder() {
+        const query = document.getElementById('librarySearch').value.trim().toLocaleLowerCase();
+        const status = document.getElementById('libraryStatus').value;
+        const variant = document.getElementById('libraryVariant').value;
+        const rating = document.getElementById('libraryRating').value;
+        const sort = document.getElementById('librarySort').value;
+        const grid = document.getElementById('tracksGrid');
+        const tracks = [...grid.querySelectorAll('.track-card')].map(trackDetails);
+        tracks.sort((a,b) => {
+            if (sort === 'az' || sort === 'za') {
+                const order = a.title.localeCompare(b.title, undefined, {sensitivity:'base',numeric:true});
+                return (sort === 'az' ? order : -order) || a.card.id.localeCompare(b.card.id);
+            }
+            // Unknown dates always stay last.
+            if (!a.created || !b.created) return (b.created ? 1 : 0) - (a.created ? 1 : 0);
+            return (sort === 'oldest' ? a.created - b.created : b.created - a.created) || a.card.id.localeCompare(b.card.id);
+        });
+        let visible = 0;
+        for (const track of tracks) {
+            const match = (activeFolderView === '__trash' ? track.card.hasAttribute('data-trashed') :
+                !track.card.hasAttribute('data-trashed') && (activeFolderView === 'default' || track.folder === activeFolderView)) &&
+                (!query || (track.title + ' ' + track.style).toLocaleLowerCase().includes(query)) &&
+                (status === 'all' || status === track.status) && (variant === 'all' || variant === track.variant) &&
+                (rating === 'all' || (track.card.getAttribute('data-rating') || 'unrated') === rating);
+            track.card.style.display = match ? 'flex' : 'none';
+            if (match) visible++;
+            grid.appendChild(track.card); // Move existing nodes: preserve playback and button handlers.
         }
+        const inTrash = activeFolderView === '__trash';
+        const scopedCount = tracks.filter(t => inTrash === t.card.hasAttribute('data-trashed')).length;
+        const count = Number(status !== 'all') + Number(variant !== 'all') + Number(rating !== 'all');
+        const expanded = !document.getElementById('libraryFilters').hidden;
+        document.getElementById('filterToggle').textContent = 'Filters (' + count + ') ' + (expanded ? '▴' : '▾');
+        document.getElementById('libraryResults').textContent = visible + ' of ' + scopedCount + ' tracks shown' +
+            (inTrash ? ' · Trash' : activeFolderView !== 'default' ? ' · selected workspace' : '');
+        document.getElementById('libraryEmpty').hidden = visible !== 0;
+        document.getElementById('libraryEmpty').textContent = scopedCount ?
+            'No matching tracks. Clear your search or filters, or select All Tracks.' :
+            (inTrash ? 'Trash is empty. Songs you remove will appear here for restoration.' : 'Your library is empty. Create your first songs to see them here.');
+        document.getElementById('tabAll').classList.toggle('active', activeFolderView === 'default');
+        document.getElementById('trashNav').textContent = '🗑 Trash (' + tracks.filter(t => t.card.hasAttribute('data-trashed')).length + ')';
+        document.getElementById('trashNav').setAttribute('aria-pressed', String(inTrash));
+        updateTrackSelection();
+
     }
 
-    function showAllTracks() {
-        document.getElementById('tabAll').classList.add('active');
-        document.getElementById('tabWork').classList.remove('active');
-        const cards = document.querySelectorAll('.track-card');
-        cards.forEach(c => c.style.display = 'flex');
+    function saveLibraryView() {
+        libraryStorage.setItem('muse_ai_library_view', JSON.stringify({
+            query: document.getElementById('librarySearch').value,
+            status: document.getElementById('libraryStatus').value,
+            variant: document.getElementById('libraryVariant').value,
+            rating: document.getElementById('libraryRating').value,
+
+            sort: document.getElementById('librarySort').value
+        }));
+        libraryStorage.setItem('muse_ai_active_folder_view', activeFolderView);
     }
 
-    function filterToWorkspace() {
-        document.getElementById('tabAll').classList.remove('active');
-        document.getElementById('tabWork').classList.add('active');
-        const cards = document.querySelectorAll('.track-card');
-        cards.forEach(c => {
-            if (workspaceList.includes(c.id)) c.style.display = 'flex';
-            else c.style.display = 'none';
+    function initialiseLibraryControls() {
+        let view = {};
+        try { view = JSON.parse(libraryStorage.getItem('muse_ai_library_view') || '{}') || {}; } catch {}
+        document.getElementById('librarySearch').value = typeof view.query === 'string' ? view.query : '';
+        document.getElementById('libraryStatus').value = ['all','ready','creating','failed','unknown'].includes(view.status) ? view.status : 'all';
+        document.getElementById('libraryVariant').value = ['all','A','B'].includes(view.variant) ? view.variant : 'all';
+
+        document.getElementById('librarySort').value = ['newest','oldest','az','za'].includes(view.sort) ? view.sort : 'newest';
+        document.getElementById('libraryRating').value = ['all','like','dislike','unrated'].includes(view.rating) ? view.rating : 'all';
+        for (const id of ['librarySearch','libraryStatus','libraryVariant','libraryRating','librarySort']) {
+            document.getElementById(id).addEventListener(id === 'librarySearch' ? 'input' : 'change', () => {
+                filterTracksByActiveFolder(); saveLibraryView();
+            });
+        }
+        document.getElementById('filterToggle').addEventListener('click', () => {
+            const panel = document.getElementById('libraryFilters');
+            panel.hidden = !panel.hidden;
+            document.getElementById('filterToggle').setAttribute('aria-expanded', String(!panel.hidden));
+            filterTracksByActiveFolder();
+        });
+        document.getElementById('clearLibraryFilters').addEventListener('click', () => {
+            document.getElementById('librarySearch').value = '';
+            document.getElementById('libraryStatus').value = 'all';
+            document.getElementById('libraryVariant').value = 'all';
+            document.getElementById('libraryRating').value = 'all';
+
+            filterTracksByActiveFolder(); saveLibraryView();
         });
     }
 
-    function toggleWorkspace(e, id) {
-        e.stopPropagation();
-        const btn = document.getElementById('btn-lib-' + id);
-        if (workspaceList.includes(id)) {
-            workspaceList = workspaceList.filter(item => item !== id);
-            btn.classList.remove('lib-added');
-            btn.innerText = "📁 Add to Lib";
-        } else {
-            workspaceList.push(id);
-            btn.classList.add('lib-added');
-            btn.innerText = "✅ In Library";
+    function changeTrackAssignedFolder(cardId, newFolderId) {
+        const card = document.getElementById(cardId);
+        if (card) {
+            card.setAttribute('data-assigned-folder', newFolderId);
+            const selectEl = card.querySelector('.ws-selector-dropdown');
+            if (selectEl) selectEl.value = newFolderId;
+            saveCurrentLibraryState(); filterTracksByActiveFolder();
         }
-        saveCurrentLibraryState();
     }
 
+    function updateAllCardDropdownMenus() {
+        const dropdowns = document.querySelectorAll('.ws-selector-dropdown');
+        dropdowns.forEach(select => {
+            const currentVal = select.value; select.innerHTML = '';
+            customFolders.forEach(fId => {
+                const opt = document.createElement('option'); opt.value = fId;
+                if (fId === 'default') opt.innerText = "Move to: Main Library";
+                else {
+                    const folderEl = document.getElementById("ws-item-" + fId);
+                    opt.innerText = "Move to: " + (folderEl ? folderEl.getAttribute('data-folder-name') : "Custom Folder");
+                }
+                select.appendChild(opt);
+            });
+            select.value = currentVal;
+        });
+    }
+
+    function setVocalProfile(profile) {
+        profile = ['male','female'].includes(profile) ? profile : '';
+        currentVocalProfile = profile;
+        libraryStorage.setItem('muse_ai_draft_vocal', profile);
+        document.getElementById('vMale').classList.toggle('active', profile === 'male');
+        document.getElementById('vFemale').classList.toggle('active', profile === 'female');
+        validateFormTitle();
+    }
+
+    function setTier(tier) {
+        currentTier = tier;
+        libraryStorage.setItem('muse_ai_draft_tier', tier);
+        document.getElementById('tierSimple').classList.toggle('active', tier === 'simple');
+        document.getElementById('tierPro').classList.toggle('active', tier === 'pro');
+        document.getElementById('tierMaster').classList.toggle('active', tier === 'master');
+        validateFormTitle();
+    }
+
+    function appendStyle(tagText) {
+        const p = document.getElementById('prompt');
+        if (!p.value.includes(tagText)) p.value += (p.value.trim() === "" ? "" : ", ") + tagText;
+        libraryStorage.setItem('muse_ai_draft_prompt', p.value);
+        validateFormTitle();
+    }
+
+    const characterCount = text => [...text].length;
+    function buildStylePrompt() {
+        const style = document.getElementById('prompt').value.trim();
+        const exclusions = document.getElementById('exclusions').value.trim();
+        const vocal = currentVocalProfile === 'female' ? 'Female lead singing vocals' :
+            currentVocalProfile === 'male' ? 'Male lead singing vocals' : 'Lead singing vocals';
+        const arrangement = {
+            simple: 'Sparse arrangement with few instruments, uncluttered accompaniment and focus on the lead vocal',
+            pro: 'Balanced arrangement with moderate instrumental layers, supporting harmonies and clear verse-chorus contrast',
+            master: 'Rich arrangement with layered instrumentation, complementary melodies and evolving sections while keeping the lead vocal clear'
+        }[currentTier] || 'Sparse arrangement with few instruments and focus on the lead vocal';
+        return style + '. ' + vocal + '. ' + arrangement +
+            (exclusions ? '. Avoid: ' + exclusions : '');
+    }
+
+    function inputLimitError() {
+        const lyricsLength = characterCount(document.getElementById('lyrics').value.trim());
+        const promptLength = characterCount(buildStylePrompt());
+        if (!['male','female'].includes(currentVocalProfile)) return 'Choose Male or Female vocals before creating a song.';
+        if (lyricsLength > 3500) return 'Shorten lyrics by ' + (lyricsLength - 3500) + ' characters before creating.';
+        if (promptLength > 2000) return 'Shorten style or exclusions by ' + (promptLength - 2000) + ' characters before creating.';
+        if (lyricsLength < 10) return 'Enter at least 10 characters of lyrics.';
+        if (!document.getElementById('prompt').value.trim()) return 'Describe your music style.';
+        return '';
+    }
+
+    function updateInputLimits() {
+        const lyricsLength = characterCount(document.getElementById('lyrics').value.trim());
+        const promptLength = characterCount(buildStylePrompt());
+        const styleLength = characterCount(document.getElementById('prompt').value.trim());
+        const exclusionsLength = characterCount(document.getElementById('exclusions').value.trim());
+        const settingsLength = promptLength - styleLength - exclusionsLength;
+        const styleBudget = Math.max(0, 2000 - settingsLength - exclusionsLength);
+        const combinedCounter = document.getElementById('combinedPromptCount');
+        const lyricCounter = document.getElementById('lyricsCount');
+        const promptCounter = document.getElementById('promptCount');
+        lyricCounter.textContent = lyricsLength + ' / 3500 lyric characters' +
+            (lyricsLength > 3500 ? ' — shorten by ' + (lyricsLength - 3500) : '');
+        promptCounter.textContent = styleLength + ' style characters entered · ' +
+            Math.max(0, styleBudget - styleLength) + ' more available with current settings.';
+        combinedCounter.textContent = 'Combined prompt: ' + promptLength + ' / 2000 characters (' +
+            styleLength + ' style + ' + exclusionsLength + ' exclusions + ' + settingsLength + ' settings and separators).' +
+            (promptLength > 2000 ? ' Shorten ' + (styleLength ? 'style or exclusions' : 'exclusions') +
+                ' by ' + (promptLength - 2000) + ' characters.' : '');
+        combinedCounter.classList.toggle('over-limit', promptLength > 2000);
+        lyricCounter.classList.toggle('over-limit', lyricsLength > 3500);
+        promptCounter.classList.toggle('over-limit', styleLength > styleBudget);
+        document.getElementById('lyrics').setAttribute('aria-invalid', String(lyricsLength > 3500));
+        document.getElementById('prompt').setAttribute('aria-invalid', String(styleLength > styleBudget));
+        document.getElementById('exclusions').setAttribute('aria-invalid', String(promptLength > 2000 && exclusionsLength > 0));
+    }
+
+    function validateFormTitle() {
+        updateInputLimits();
+        const titleField = document.getElementById('trackTitle');
+        const warnText = document.getElementById('titleWarningText');
+        const btn = document.getElementById('genBtn');
+        const missingTitle = !titleField.value.trim();
+        titleField.classList.toggle('input-error', missingTitle);
+        warnText.style.display = missingTitle ? 'block' : 'none';
+        const problem = missingTitle ? 'Enter a song title to continue.' : inputLimitError();
+        btn.disabled = generationBusy || Boolean(problem);
+        btn.innerText = generationBusy ? 'Creating songs…' : 'Create';
+        document.getElementById('createWarning').textContent = generationBusy ? '' : problem;
+    }
+
+    function showAllTracks() {
+
+        selectWorkspaceFolder('default'); saveLibraryView();
+    }
     function shareTrack(e, url) {
-        e.stopPropagation();
-        const shareLink = window.location.origin + url;
-        navigator.clipboard.writeText(shareLink);
-        alert("✨ Share link copied to your clipboard!\nLink: " + shareLink);
+        e.stopPropagation(); const link = window.location.origin + url;
+        navigator.clipboard.writeText(link); alert("✨ Clipboard copied!\nPrivate link (requires your account): " + link);
+    }
+
+    let playbackAttempt = 0;
+
+    function syncPlayButtons() {
+        const player = document.getElementById('audioPlayer');
+        document.querySelectorAll('.track-card').forEach(card => {
+            const button = card.querySelector('.btn-play');
+            const playing = Boolean(card.getAttribute('data-audio-src')) &&
+                card.getAttribute('data-audio-src') === player.getAttribute('src') &&
+                !player.paused && !player.ended;
+            card.classList.toggle('is-playing', playing && !player.error && player.readyState >= 3);
+            if (!button) return;
+            button.textContent = playing ? '⏸ Pause' : '▶ Play';
+            button.setAttribute('aria-label', (playing ? 'Pause ' : 'Play ') +
+                (card.getAttribute('data-track-title') || 'track'));
+            button.setAttribute('aria-pressed', String(playing));
+        });
+    }
+
+    async function playLibraryTrack(event, cardId) {
+        event.stopPropagation();
+        const card = document.getElementById(cardId);
+        if (!card || card.classList.contains('is-cooking') || card.hasAttribute('data-failed')) return;
+        const source = card.getAttribute('data-audio-src');
+        if (!source) return;
+        const player = document.getElementById('audioPlayer');
+        const attempt = ++playbackAttempt;
+        if (player.getAttribute('src') === source && !player.paused && !player.ended) {
+            player.pause();
+            syncPlayButtons();
+            return;
+        }
+        if (player.getAttribute('src') !== source) {
+            player.pause();
+            player.src = source;
+        } else if (player.ended) {
+            player.currentTime = 0;
+        }
+        document.getElementById('pTitle').textContent = card.getAttribute('data-track-title') || 'Custom Track';
+        document.getElementById('pStatus').textContent = 'Loading audio…';
+        try {
+            await player.play();
+        } catch (error) {
+            if (attempt === playbackAttempt && error.name !== 'AbortError') {
+                document.getElementById('pStatus').textContent = 'Could not play this track. Check that the server is running and its audio file is available.';
+            }
+        } finally {
+            syncPlayButtons();
+        }
+    }
+
+    function initialisePlaybackControls() {
+        const player = document.getElementById('audioPlayer');
+        for (const name of ['play','playing','pause','ended','emptied','error','waiting']) {
+            player.addEventListener(name, () => {
+                syncPlayButtons();
+                const status = document.getElementById('pStatus');
+                if (player.error) status.textContent = 'Audio unavailable. Check the server and audio file.';
+                else if (player.ended) status.textContent = 'Finished';
+                else if (!player.getAttribute('src')) status.textContent = 'System Standby';
+                else if (player.paused) status.textContent = 'Paused';
+                else status.textContent = name === 'waiting' ? 'Buffering…' : 'Playing';
+            });
+        }
+        syncPlayButtons();
+    }
+
+    function ensurePlayButton(card) {
+        card.querySelectorAll('.btn-play').forEach(button => button.remove());
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'action-icon-btn btn-play';
+        button.textContent = '▶ Play';
+        button.setAttribute('aria-label', 'Play ' + (card.getAttribute('data-track-title') || 'track'));
+        button.disabled = card.classList.contains('is-cooking') || card.hasAttribute('data-failed') || !card.getAttribute('data-audio-src');
+        button.onclick = event => playLibraryTrack(event, card.id);
+        card.insertBefore(button, card.firstChild);
+        syncPlayButtons();
+    }
+
+    function ensureTrackArtwork(card) {
+        const holder = card.querySelector('.card-wave-art');
+        if (!holder) return;
+        // Seed artwork with the track ID so it remains stable across refreshes.
+        let seed = 2166136261;
+        for (const char of card.id) seed = Math.imul(seed ^ char.charCodeAt(0), 16777619) >>> 0;
+        const random = () => {
+            seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+            return seed / 4294967296;
+        };
+        const palettes = [
+            ['#172554','#fb7185','#fbbf24','#312e81','#0f172a'],
+            ['#083344','#22d3ee','#fef08a','#0f766e','#134e4a'],
+            ['#3b0764','#c084fc','#f9a8d4','#6d28d9','#1e1b4b'],
+            ['#431407','#fb923c','#fef3c7','#c2410c','#450a0a'],
+            ['#052e16','#86efac','#fde68a','#166534','#022c22']
+        ];
+        const [sky, glow, sun, ridge, foreground] = palettes[Math.floor(random()*palettes.length)];
+        const sunX = Math.round(25 + random()*70);
+        const sunY = Math.round(20 + random()*35);
+        const peak = Math.round(15 + random()*90);
+        const scene = Math.floor(random()*3);
+        let landscape;
+        if (scene === 0) {
+            landscape = '<path d="M0 100 L' + peak + ' 49 L128 110 V128 H0Z" fill="' + ridge + '"/>' +
+                '<path d="M0 115 L35 81 L69 110 L100 70 L128 99 V128 H0Z" fill="' + foreground + '"/>';
+        } else if (scene === 1) {
+            landscape = '<path d="M0 78 Q35 60 70 80 T128 74 V128 H0Z" fill="' + ridge + '"/>' +
+                '<path d="M0 104 Q32 84 64 104 T128 96 V128 H0Z" fill="' + foreground + '"/>' +
+                '<path d="M45 90 H80 M35 97 H90 M49 104 H77" stroke="' + sun + '" opacity=".4" stroke-width="2"/>';
+        } else {
+            landscape = '<path d="M0 98 Q40 45 85 87 T128 88 V128 H0Z" fill="' + ridge + '"/>' +
+                '<path d="M0 119 Q55 77 128 107 V128 H0Z" fill="' + foreground + '"/>';
+        }
+        const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">' +
+            '<defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="' + sky + '"/><stop offset="1" stop-color="' + glow + '"/></linearGradient></defs>' +
+            '<rect width="128" height="128" fill="url(#sky)"/><circle cx="' + sunX + '" cy="' + sunY + '" r="16" fill="' + sun + '"/>' +
+            landscape + '</svg>';
+        const picture = document.createElement('img');
+        picture.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        picture.alt = '';
+        picture.width = 56;
+        picture.height = 56;
+        holder.replaceChildren(picture);
+        const equalizer=document.createElement('span');equalizer.className='track-equalizer';equalizer.setAttribute('aria-hidden','true');
+        for(let i=0;i<5;i++)equalizer.appendChild(document.createElement('i'));
+        holder.appendChild(equalizer);
+        card.classList.remove('is-playing');
+        holder.classList.add('track-cover');
     }
 
     function bindCardEvents(card) {
-        card.onclick = function() {
-            const audioPlayer = document.getElementById('audioPlayer');
-            const src = this.getAttribute('data-audio-src');
-            const title = this.getAttribute('data-track-title');
-            if (src) {
-                audioPlayer.src = src;
-                document.getElementById('pTitle').innerText = title || "Custom AI Track";
-                document.getElementById('pStatus').innerText = "Playing Asset";
-                audioPlayer.play();
-            }
+        card.querySelectorAll('a[download]').forEach(link=>{
+            link.onclick=event=>{event.preventDefault();event.stopPropagation();downloadSong(card);};
+        });
+        // Remove obsolete controls from cards saved by earlier versions.
+        card.querySelectorAll('[id^="btn-lib-"], [onclick*="toggleWorkspace"]').forEach(button => button.remove());
+        ensureTrackArtwork(card);
+        ensureDeleteButton(card);
+        card.onclick = event => {
+            if (event.target.closest('button, a, select, input, textarea')) return;
+            openTrackDetails(card.id);
         };
+        const select = card.querySelector('.ws-selector-dropdown');
+        if (select) {
+            select.onclick = function(e) { e.stopPropagation(); };
+            select.onchange = function() { changeTrackAssignedFolder(card.id, this.value); };
+        }
+    }
+
+    function updateTokenDisplay() {
+        document.getElementById('tkAvailable').innerText = tokensAvailable;
+        document.getElementById('tkSpent').innerText = tokensSpent;
     }
 
     function saveCurrentLibraryState() {
+        filterTracksByActiveFolder();
         const gridHTML = document.getElementById('tracksGrid').innerHTML;
-        localStorage.setItem('muse_ai_library', gridHTML);
-        localStorage.setItem('muse_ai_workspace_list', JSON.stringify(workspaceList));
-    }
+        libraryStorage.setItem('muse_ai_library', gridHTML);
 
+        libraryStorage.setItem('muse_ai_custom_folders', JSON.stringify(customFolders));
+        libraryStorage.setItem('muse_ai_active_folder_view', activeFolderView);
+
+        let fMeta = [];
+        customFolders.forEach(fId => {
+            if (fId !== 'default') {
+                const el = document.getElementById("ws-item-" + fId);
+                if (el) fMeta.push({ id: fId, name: el.getAttribute('data-folder-name') });
+            }
+        });
+        libraryStorage.setItem('muse_ai_folder_meta', JSON.stringify(fMeta));
+    }
     function loadSavedLibraryAndInputs() {
-        const savedCards = localStorage.getItem('muse_ai_library');
-        const savedList = localStorage.getItem('muse_ai_workspace_list');
-        
-        const savedTitle = localStorage.getItem('muse_ai_draft_title');
-        const savedPrompt = localStorage.getItem('muse_ai_draft_prompt');
-        const savedLyrics = localStorage.getItem('muse_ai_draft_lyrics');
+        const savedCards = libraryStorage.getItem('muse_ai_library');
+
+        const savedFolders = libraryStorage.getItem('muse_ai_custom_folders');
+        const savedFolderView = libraryStorage.getItem('muse_ai_active_folder_view');
+        const savedMeta = libraryStorage.getItem('muse_ai_folder_meta');
+        const savedTitle = libraryStorage.getItem('muse_ai_draft_title');
+        const savedPrompt = libraryStorage.getItem('muse_ai_draft_prompt');
+        const savedLyrics = libraryStorage.getItem('muse_ai_draft_lyrics');
+        const savedExclusions = libraryStorage.getItem('muse_ai_draft_exclusions');
+        const tAvail = libraryStorage.getItem('muse_ai_tokens_avail');
+        const tSpent = libraryStorage.getItem('muse_ai_tokens_spent');
 
         if (savedTitle !== null) document.getElementById('trackTitle').value = savedTitle;
         if (savedPrompt !== null) document.getElementById('prompt').value = savedPrompt;
         if (savedLyrics !== null) document.getElementById('lyrics').value = savedLyrics;
+        if (savedExclusions !== null) document.getElementById('exclusions').value = savedExclusions;
 
+        updateTokenDisplay();
+
+        if (savedFolders) customFolders = JSON.parse(savedFolders);
+        if (savedFolderView) activeFolderView = savedFolderView;
+
+        if (savedMeta) {
+            const meta = JSON.parse(savedMeta);
+            const listContainer = document.getElementById('sidebarWorkspaceList');
+            meta.forEach(item => {
+                if (!document.getElementById("ws-item-" + item.id)) {
+                    const newItem = document.createElement('div');
+                    newItem.className = 'ws-item'; newItem.id = "ws-item-" + item.id;
+                    newItem.setAttribute('data-folder-id', item.id); newItem.setAttribute('data-folder-name', item.name);
+                    newItem.innerText = "📁 " + item.name; newItem.onclick = function() { selectWorkspaceFolder(item.id); };
+                    listContainer.appendChild(newItem);
+                }
+            });
+        }
         if (savedCards) {
             document.getElementById('tracksGrid').innerHTML = savedCards;
-            if (savedList) workspaceList = JSON.parse(savedList);
+
             const cards = document.querySelectorAll('.track-card');
-            cards.forEach(card => bindCardEvents(card));
+            cards.forEach(card => {
+                bindCardEvents(card);
+                const sel = card.querySelector('.ws-selector-dropdown');
+                if (sel) sel.value = card.getAttribute('data-assigned-folder') || 'default';
+            });
+        }
+        selectWorkspaceFolder(activeFolderView);
+    }
+
+    function createOptimisticPlaceholderCard(baseTitle, variantLabel, promptInput, temporaryId) {
+        const grid = document.getElementById('tracksGrid');
+        const fullTitle = `${baseTitle} (${variantLabel})`;
+        const card = document.createElement('div');
+        card.className = 'track-card is-cooking'; card.id = temporaryId;
+        card.setAttribute('data-assigned-folder', activeFolderView === '__trash' ? 'default' : activeFolderView);
+        card.setAttribute('data-track-title', fullTitle);
+        card.setAttribute('data-track-style', promptInput);
+        if (pendingBatch?.settings) card.setAttribute('data-creation-settings', JSON.stringify(pendingBatch.settings));
+        card.setAttribute('data-created-at', String(Date.now()));
+        card.setAttribute('data-variant', variantLabel.match(/Variant ([AB])/i)?.[1]?.toUpperCase() || '');
+        let optsHtml = '';
+        customFolders.forEach(fId => {
+            if (fId === 'default') optsHtml += `<option value="default">Main Library</option>`;
+            else {
+                const folderEl = document.getElementById("ws-item-" + fId);
+                optsHtml += `<option value="${fId}">${escapeHtml(folderEl ? folderEl.getAttribute('data-folder-name') : "Workspace")}</option>`;
+            }
+        });
+        card.innerHTML = `
+            <div class="card-wave-art"><div class="card-wave-bars"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div></div>
+            <div class="card-details">
+                <div class="card-title" style="color:var(--accent-purple);">${escapeHtml(fullTitle)}</div>
+                <div class="card-style">Creating your song… You can leave this page and return later while the server stays running.</div>
+            </div>
+            <div class="card-actions is-hidden">
+                <select class="ws-selector-dropdown" data-parent-card-id="${temporaryId}">${optsHtml}</select>
+                <div class="btn-row-split"><button class="action-icon-btn">💾 Loading</button><button class="action-icon-btn">📁 Wait</button></div>
+            </div>
+        `;
+        grid.insertBefore(card, grid.firstChild); bindCardEvents(card);
+    }
+
+        // NEW SYSTEM FEATURE: Completely removes card track nodes from layout and memory indexes
+    let selectedTrackSettings = null;
+
+    function readTrackSettings(card) {
+        let stored = null;
+        try { stored = JSON.parse(card.getAttribute('data-creation-settings') || 'null'); } catch {}
+        if (stored && stored.version === 1) return stored;
+        // Do not attach the current form's lyrics to an older, unrelated recording.
+        return {
+            version: 0,
+            title: card.getAttribute('data-track-title') || card.querySelector('.card-title')?.textContent || 'Untitled track',
+            style: card.getAttribute('data-track-style') ?? null,
+            stylePreview: card.querySelector('.card-style')?.textContent || '',
+            lyrics: null, exclusions: null, vocal: null, tier: null, submittedPrompt: null
+        };
+    }
+
+    let renamingSongId = null;
+    function openSongRename(event, cardId) {
+        event.stopPropagation();
+        const card=document.getElementById(cardId);if(!card)return;
+        renamingSongId=cardId;
+        const input=document.getElementById('renameSongInput');
+        input.value=card.getAttribute('data-track-title') || '';
+        document.getElementById('renameSongError').textContent='';
+        document.getElementById('renameSongDialog').showModal();input.focus();input.select();
+    }
+    function renameSong(cardId, value) {
+        const title=String(value).trim();
+        if(!title)throw Error('Enter a song title.');
+        if(characterCount(title)>200)throw Error('Use 200 characters or fewer for the title.');
+        const card=document.getElementById(cardId);if(!card)throw Error('This song is no longer in the library.');
+        const previous={title:card.getAttribute('data-track-title'),custom:card.getAttribute('data-custom-title'),text:card.querySelector('.card-title').textContent};
+        card.setAttribute('data-track-title',title);card.setAttribute('data-custom-title',title);
+        card.querySelector('.card-title').textContent=title;
+        try {saveCurrentLibraryState();}
+        catch(error){
+            for(const [key,val] of [['data-track-title',previous.title],['data-custom-title',previous.custom]]){if(val===null)card.removeAttribute(key);else card.setAttribute(key,val);}
+            card.querySelector('.card-title').textContent=previous.text;filterTracksByActiveFolder();
+            throw Error('The title could not be saved. Please try again.');
+        }
+        const player=document.getElementById('audioPlayer');
+        if(card.getAttribute('data-audio-src') && card.getAttribute('data-audio-src')===player.getAttribute('src'))document.getElementById('pTitle').textContent=title;
+        const checkbox=card.querySelector('.track-select');if(checkbox)checkbox.setAttribute('aria-label','Select '+title);
+        const download=card.querySelector('a[download]');if(download)download.setAttribute('download',title+'.mp3');
+        syncPlayButtons();
+    }
+    function saveSongRename(event) {
+        event.preventDefault();
+        try {renameSong(renamingSongId,document.getElementById('renameSongInput').value);document.getElementById('renameSongDialog').close();}
+        catch(error){document.getElementById('renameSongError').textContent=error.message;}
+    }
+    function ensureRenameButton(card) {
+        card.querySelectorAll('.btn-rename').forEach(button=>button.remove());
+        const title=card.querySelector('.card-title');if(!title)return;
+        let row=card.querySelector('.card-title-row');
+        if(!row){row=document.createElement('div');row.className='card-title-row';title.parentNode.insertBefore(row,title);row.appendChild(title);}
+        const button=document.createElement('button');button.type='button';button.className='action-icon-btn btn-rename';button.textContent='Rename';
+        button.onclick=event=>openSongRename(event,card.id);row.appendChild(button);
+    }
+    function ensureDetailsButton(card) {
+        card.querySelectorAll('.btn-details').forEach(button => button.remove());
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'action-icon-btn btn-details';
+        button.textContent = 'Details';
+        button.onclick = event => { event.stopPropagation(); openTrackDetails(card.id); };
+        card.appendChild(button);
+    }
+
+    function openTrackDetails(cardId) {
+        const card = document.getElementById(cardId);
+        if (!card) return;
+        selectedTrackSettings = readTrackSettings(card);
+        const settings = selectedTrackSettings;
+        const missing = 'Not saved for this older track.';
+        document.getElementById('detailsTitle').textContent = card.getAttribute('data-track-title') || settings.title;
+        document.getElementById('detailsStyle').textContent = settings.style ??
+            (settings.stylePreview ? settings.stylePreview + '\n(Only this preview was saved.)' : missing);
+        document.getElementById('detailsLyrics').textContent = settings.lyrics ?? missing;
+        document.getElementById('detailsExclusions').textContent = settings.exclusions === '' ? 'None' : settings.exclusions ?? missing;
+        document.getElementById('detailsVocal').textContent = ({male:'Male',female:'Female',custom: settings.voiceName ? 'Saved voice: ' + settings.voiceName : 'Custom (no saved recording)'})[settings.vocal] || missing;
+        document.getElementById('detailsTier').textContent = ({simple:'Simple',pro:'Balanced',master:'Rich'})[settings.tier] || missing;
+        document.getElementById('detailsSubmitted').textContent = settings.submittedPrompt ?? missing;
+        document.getElementById('detailsNotice').textContent = settings.version === 1 ?
+            'Original settings saved at submission. Stored with your library in this browser.' :
+            'This older track has incomplete details. Reusing it copies known fields, clears missing text, and uses Male / Standard defaults for unsaved selections.';
+        document.getElementById('reuseTrackSettings').disabled = generationBusy;
+        if (generationBusy) document.getElementById('detailsNotice').textContent += ' Wait until generation finishes before reusing settings.';
+        document.getElementById('trackDetailsDialog').showModal();
+    }
+
+    function saveCreationDraft() {
+        for (const [id,key] of [['trackTitle','title'],['prompt','prompt'],['lyrics','lyrics'],['exclusions','exclusions']]) {
+            libraryStorage.setItem('muse_ai_draft_' + key, document.getElementById(id).value);
+        }
+        libraryStorage.setItem('muse_ai_draft_vocal', currentVocalProfile);
+        libraryStorage.setItem('muse_ai_draft_tier', currentTier);
+    }
+
+    function reuseTrackSettings() {
+        if (!selectedTrackSettings || generationBusy) return;
+        const settings = selectedTrackSettings;
+        document.getElementById('trackTitle').value = settings.title || '';
+        document.getElementById('prompt').value = settings.style ?? '';
+        document.getElementById('lyrics').value = settings.lyrics ?? '';
+        document.getElementById('exclusions').value = settings.exclusions ?? '';
+        setVocalProfile(['male','female'].includes(settings.vocal) ? settings.vocal : settings.vocal === 'custom' ? '' : 'male');
+        setTier(['simple','pro','master'].includes(settings.tier) ? settings.tier : 'simple');
+        saveCreationDraft();
+        validateFormTitle();
+        document.getElementById('trackDetailsDialog').close();
+        document.querySelector('.creator-fields').scrollTop = 0;
+        document.getElementById('trackTitle').focus();
+        document.getElementById('status-info').textContent = 'Settings copied. Edit them, then click Create when ready.';
+    }
+
+    function rateTrack(event, cardId, rating) {
+        event.stopPropagation();
+        if (!['like','dislike'].includes(rating)) return;
+        const card = document.getElementById(cardId);
+        if (!card) return;
+        if (card.getAttribute('data-rating') === rating) card.removeAttribute('data-rating');
+        else card.setAttribute('data-rating', rating);
+        updateRatingButtons(card);
+        saveCurrentLibraryState();
+    }
+
+    function updateRatingButtons(card) {
+        const selected = card.getAttribute('data-rating');
+        card.querySelectorAll('.rating-btn').forEach(button => {
+            const active = button.getAttribute('data-rating-choice') === selected;
+            button.setAttribute('aria-pressed', String(active));
+            button.classList.toggle('is-selected', active);
+            button.title = active ? 'Click to clear this rating' : button.textContent;
+        });
+    }
+
+    function ensureRatingButtons(card) {
+        let group = card.querySelector('.track-rating');
+        if (!group) {
+            group = document.createElement('div');
+            group.className = 'track-rating';
+            group.setAttribute('role','group');
+            group.setAttribute('aria-label','Rate this song');
+            card.appendChild(group);
+        }
+        group.replaceChildren();
+        for (const [rating, label] of [['like','👍 Like'],['dislike','👎 Dislike']]) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'action-icon-btn rating-btn rating-' + rating;
+            button.textContent = label;
+            button.setAttribute('data-rating-choice', rating);
+            button.onclick = event => rateTrack(event, card.id, rating);
+            group.appendChild(button);
+        }
+        updateRatingButtons(card);
+    }
+
+    function ensureDeleteButton(card) {
+        ensureTrackCheckbox(card);
+        ensureRatingButtons(card);
+        ensurePlayButton(card);
+        ensureDetailsButton(card);
+        ensureRenameButton(card);
+        // Also upgrade saved cards created before the Delete button existed.
+        card.querySelectorAll('.btn-delete').forEach(button => button.remove());
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'action-icon-btn btn-delete';
+        button.textContent = card.hasAttribute('data-trashed') ? 'Restore' : 'Move to Trash';
+        button.setAttribute('aria-label', button.textContent + ': ' + (card.getAttribute('data-track-title') || 'track'));
+        button.onclick = event => deleteTrackCard(event, card.id);
+        card.appendChild(button);
+    }
+
+    function ensureTrackCheckbox(card) {
+        let checkbox = card.querySelector('.track-select');
+        if (!checkbox) {
+            checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'track-select';
+            card.prepend(checkbox);
+        }
+        checkbox.removeAttribute('checked');
+        checkbox.checked = selectedTrackIds.has(card.id);
+        checkbox.setAttribute('aria-label', 'Select ' + (card.getAttribute('data-track-title') || 'song'));
+        checkbox.onclick = event => event.stopPropagation();
+        checkbox.onchange = () => {
+            if (checkbox.checked) selectedTrackIds.add(card.id);
+            else selectedTrackIds.delete(card.id);
+            updateTrackSelection();
+        };
+    }
+
+    function updateTrackSelection() {
+        const cards = [...document.getElementById('tracksGrid').querySelectorAll('.track-card')];
+        const visible = cards.filter(card => card.style.display !== 'none');
+        const visibleIds = new Set(visible.map(card => card.id));
+        for (const id of selectedTrackIds) if (!visibleIds.has(id)) selectedTrackIds.delete(id);
+        for (const card of cards) {
+            const selected = selectedTrackIds.has(card.id);
+            const checkbox = card.querySelector('.track-select');
+            if (checkbox) checkbox.checked = selected;
+            card.classList.toggle('is-selected', selected);
+        }
+        const all = document.getElementById('selectVisibleTracks');
+        all.checked = visible.length > 0 && selectedTrackIds.size === visible.length;
+        all.indeterminate = selectedTrackIds.size > 0 && selectedTrackIds.size < visible.length;
+        all.disabled = visible.length === 0;
+        document.getElementById('selectionCount').textContent = selectedTrackIds.size + ' selected';
+        const action = document.getElementById('bulkTrackAction');
+        action.disabled = selectedTrackIds.size === 0;
+        action.textContent = activeFolderView === '__trash' ? 'Restore selected' : 'Move to Trash';
+        if(selectedTrackIds.size)action.textContent += ' ('+selectedTrackIds.size+')';
+        for(const card of cards){
+            const button=card.querySelector('.btn-delete');
+            if(button){const bulk=selectedTrackIds.has(card.id);button.textContent=(card.hasAttribute('data-trashed')?'Restore':'Move to Trash')+(bulk?' ('+selectedTrackIds.size+' selected)':'');button.setAttribute('aria-label',button.textContent);}
+        }
+    }
+
+    function selectVisibleTracks(checked) {
+        selectedTrackIds.clear();
+        if (checked) document.getElementById('tracksGrid').querySelectorAll('.track-card').forEach(card => {
+            if (card.style.display !== 'none') selectedTrackIds.add(card.id);
+        });
+        updateTrackSelection();
+    }
+
+    function applyBulkTrackAction() {
+        changeTrashState([...selectedTrackIds], activeFolderView !== '__trash');
+    }
+
+    function deleteTrackCard(event, cardId) {
+        event.stopPropagation();
+        const card = document.getElementById(cardId);
+        if(card && selectedTrackIds.has(cardId)){changeTrashState([...selectedTrackIds],!card.hasAttribute('data-trashed'));return;}
+        if (card) changeTrashState([cardId], !card.hasAttribute('data-trashed'));
+    }
+
+    function changeTrashState(ids, toTrash) {
+        const cards = ids.map(id => document.getElementById(id)).filter(Boolean);
+        if (!cards.length) return;
+        const previous = cards.map(card => ({card, trash: card.getAttribute('data-trashed'), folder: card.getAttribute('data-assigned-folder')}));
+        for (const card of cards) {
+            if (toTrash) card.setAttribute('data-trashed', String(Date.now()));
+            else {
+                card.removeAttribute('data-trashed');
+                if (!customFolders.includes(card.getAttribute('data-assigned-folder'))) card.setAttribute('data-assigned-folder', 'default');
+            }
+            ensureDeleteButton(card);
+            const folder = card.querySelector('.ws-selector-dropdown');
+            if (folder) folder.value = card.getAttribute('data-assigned-folder') || 'default';
+        }
+        try {
+            saveCurrentLibraryState();
+        } catch (error) {
+            for (const {card, trash, folder} of previous) {
+                if (trash === null) card.removeAttribute('data-trashed'); else card.setAttribute('data-trashed', trash);
+                if (folder === null) card.removeAttribute('data-assigned-folder'); else card.setAttribute('data-assigned-folder', folder);
+                ensureDeleteButton(card);
+            }
+            filterTracksByActiveFolder();
+            document.getElementById('trashStatus').textContent = 'Could not save this change. Your songs have been kept. Browser storage may be full.';
+            return;
+        }
+        const player = document.getElementById('audioPlayer');
+        if (toTrash && cards.some(card => card.getAttribute('data-audio-src') && card.getAttribute('data-audio-src') === player.getAttribute('src'))) {
+            ++playbackAttempt;
+            player.pause(); player.removeAttribute('src'); player.load();
+            document.getElementById('pTitle').textContent = 'No Audio Loaded';
+            document.getElementById('pStatus').textContent = 'Song moved to Trash';
+        }
+        selectedTrackIds.clear();
+        filterTracksByActiveFolder();
+        updateTrackSelection();
+        document.getElementById('trashStatus').textContent = cards.length + (cards.length === 1 ? ' song ' : ' songs ') +
+            (toTrash ? 'moved to Trash. You can restore them there.' : 'restored to their libraries.') +
+            (toTrash && cards.some(card => card.classList.contains('is-cooking')) ? ' Songs already generating will continue and may use credits.' : '');
+    }
+
+    function upgradePlaceholderToActiveTrack(temporaryId, audioUrl, trackTitle, promptInput) {
+        const card = document.getElementById(temporaryId); if (!card) return;
+        trackTitle = card.getAttribute('data-custom-title') || trackTitle;
+        card.setAttribute('data-track-style', promptInput);
+        card.classList.remove('is-cooking'); card.setAttribute('data-audio-src', audioUrl); card.setAttribute('data-track-title', trackTitle);
+        const titleEl = card.querySelector('.card-title'); const styleEl = card.querySelector('.card-style'); const actionsEl = card.querySelector('.card-actions');
+        if (titleEl) { titleEl.textContent = `🔊 ${trackTitle}`; titleEl.style.color = '#fff'; }
+        if (styleEl) styleEl.innerText = `${promptInput.substring(0, 35)}...`;
+
+        let optsHtml = '';
+        customFolders.forEach(fId => {
+            if (fId === 'default') optsHtml += `<option value="default">Move to: Main Library</option>`;
+            else {
+                const folderEl = document.getElementById("ws-item-" + fId);
+                optsHtml += `<option value="${fId}">Move to: ${escapeHtml(folderEl ? folderEl.getAttribute('data-folder-name') : "Folder")}</option>`;
+            }
+        });
+
+        if (actionsEl) {
+            actionsEl.classList.remove('is-hidden');
+            actionsEl.innerHTML = `
+                <select class="ws-selector-dropdown" data-parent-card-id="${temporaryId}">${optsHtml}</select>
+                <div class="btn-row-split">
+                    <a href="#" download="${escapeHtml(trackTitle)}.mp3" class="action-icon-btn" onclick="event.preventDefault();event.stopPropagation();downloadSong(this.closest('.track-card'));">💾 Download</a>
+
+                    <button class="action-icon-btn" onclick="shareTrack(event, '${audioUrl}')">🔗 Share</button>
+                    <!-- UPGRADED BUTTON: Triggers the delete sequence instantly -->
+                    <button class="action-icon-btn btn-delete" onclick="deleteTrackCard(event, '${temporaryId}')">❌ Delete</button>
+                </div>
+            `;
+        }
+        ensureDeleteButton(card);
+        const select = card.querySelector('.ws-selector-dropdown');
+        if (select) {
+            select.value = card.getAttribute('data-assigned-folder') || 'default'; select.setAttribute('data-parent-card-id', temporaryId);
+            select.onchange = function() { changeTrackAssignedFolder(temporaryId, this.value); };
+        }
+    }
+
+    function setBusy(busy) {
+        generationBusy = busy;
+        document.getElementById('trackTitle').disabled = busy;
+        document.getElementById('loader').style.display = busy ? 'block' : 'none';
+        validateFormTitle();
+    }
+
+    function persistBatch() {
+        // One saved snapshot makes charging a finished variant idempotent on refresh.
+        libraryStorage.setItem('muse_ai_job_snapshot', JSON.stringify({
+            batch: pendingBatch
+        }));
+        saveCurrentLibraryState();
+    }
+
+    let generationRequest = null;
+    async function testPurchase(product,button) {
+        button.disabled=true;
+        const key='muse_test_purchase_'+MuseAuth.user.id+'_'+product;
+        try {
+            const requestId=sessionStorage.getItem(key)||crypto.randomUUID();sessionStorage.setItem(key,requestId);
+            await fetchJSON('/purchases/test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product,requestId})});
+            sessionStorage.removeItem(key);await refreshCredits();await showPlans();
+        } catch(error){alert(error.message);} finally{button.disabled=false;}
+    }
+    async function showPlans() {
+        try {
+            const w=await refreshCredits();let dialog=document.getElementById('plansDialog');
+            if(!dialog){dialog=document.createElement('dialog');dialog.id='plansDialog';dialog.style.cssText='background:#151023;color:white;border:1px solid #9040dd;max-width:700px;max-height:80vh;overflow:auto;padding:24px';document.body.append(dialog);}
+            dialog.replaceChildren();
+            const heading=document.createElement('h2');heading.textContent='Plans & downloads — TEST MODE';dialog.append(heading);
+            const info=document.createElement('p');info.textContent='No money is charged. Each Create makes 2 songs for 10 credits total. Monthly allowances reset on the first of the month (UTC); unused monthly allowances expire. Extra download bundles carry over.';dialog.append(info);
+            const state=document.createElement('p');state.textContent='Current plan: '+w.plan+'. Downloads remaining: '+w.downloadsAvailable+'. Next month: '+w.nextPlan+'.';dialog.append(state);
+            for(const [plan,credits,downloads] of [['free',500,10],['pro',5000,25],['premium',10000,60]]){
+                const row=document.createElement('p');row.textContent=plan.toUpperCase()+' — '+credits.toLocaleString()+' credits / month · '+downloads+' downloads / month ';dialog.append(row);
+                const button=document.createElement('button');button.textContent=plan===w.plan?'Keep this plan':'Test '+plan+' plan';button.onclick=()=>testPurchase(plan,button);row.append(button);
+            }
+            const note=document.createElement('p');note.textContent='Upgrades add the difference in this month’s credit allowance. Downgrades start next month. Switching plans does not reset downloads already used. Prices will be added before launch.';dialog.append(note);
+            for(const count of [1,10,20]){const button=document.createElement('button');button.textContent='Test purchase: '+count+' extra download'+(count===1?'':'s');button.style.margin='5px';button.onclick=()=>testPurchase('downloads-'+count,button);dialog.append(button);}
+            const close=document.createElement('button');close.textContent='Close';close.onclick=()=>dialog.close();dialog.append(close);if(!dialog.open)dialog.showModal();
+        }catch(error){alert(error.message);}
+    }
+    async function downloadSong(card) {
+        if(card._downloading)return;
+        card._downloading=true;
+        try {
+            const filename=new URL(card.getAttribute('data-audio-src'),location.origin).pathname.split('/').pop();
+            const key='muse_download_'+MuseAuth.user.id+'_'+filename;
+            const requestId=sessionStorage.getItem(key)||crypto.randomUUID();sessionStorage.setItem(key,requestId);
+            const data=await fetchJSON('/downloads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestId,filename})});
+            const response=await MuseAuth.fetch(data.url);if(!response.ok)throw Error('Download interrupted. Click Download to retry without using another allowance.');
+            const url=URL.createObjectURL(await response.blob()),a=document.createElement('a');a.href=url;a.download=(card.getAttribute('data-track-title')||'song')+'.mp3';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
+            sessionStorage.removeItem(key);await refreshCredits();
+        }catch(error){alert(error.message);}finally{card._downloading=false;}
+    }
+    async function refreshCredits() {
+        const wallet = await fetchJSON('/credits');
+        tokensAvailable = wallet.available; tokensSpent = wallet.spent;
+        updateTokenDisplay();
+        document.getElementById('planNameBadge').textContent=wallet.plan.toUpperCase();
+        document.getElementById('downloadsBadge').textContent=wallet.downloadsAvailable+' downloads left';
+        return wallet;
+    }
+    async function showCreditHistory() {
+        try {
+            const wallet=await refreshCredits();
+            let dialog=document.getElementById('creditHistory');
+            if(!dialog){dialog=document.createElement('dialog');dialog.id='creditHistory';dialog.style.cssText='background:#151023;color:white;border:1px solid #9040dd;max-width:650px;max-height:80vh;overflow:auto;padding:24px';document.body.append(dialog);}
+            dialog.replaceChildren();
+            const heading=document.createElement('h2');heading.textContent='Credit history';dialog.append(heading);
+            const close=document.createElement('button');close.textContent='Close';close.onclick=()=>dialog.close();dialog.append(close);
+            const info=document.createElement('p');info.textContent=wallet.available+' available · '+wallet.reserved+' reserved · '+wallet.spent+' spent. App credits are separate from Replicate charges.';dialog.append(info);
+            for(const job of wallet.attention){
+                const row=document.createElement('p');row.textContent=job.id+': '+job.error;dialog.append(row);
+                if(job.predictionId){const retry=document.createElement('button');retry.textContent='Retry checking / saving audio';retry.onclick=async()=>{await fetchJSON('/credits/retry-save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jobId:job.id})});dialog.close();};dialog.append(retry);}
+                else {const help=document.createElement('p');help.textContent='Credits remain reserved until the server owner checks the Replicate prediction history. This prevents an uncertain request from being sent twice.';dialog.append(help);}
+            }
+            for(const item of wallet.history){const row=document.createElement('p');row.textContent=new Date(item.created).toLocaleString()+' — '+item.kind+' '+item.amount+' credits — '+item.title;dialog.append(row);}
+            dialog.showModal();
+        } catch(error){alert(error.message);}
+    }
+    async function fetchJSON(url, options = {}) {
+        const response = await MuseAuth.fetch(url, {...options, signal: AbortSignal.timeout(30000)});
+        const data = await response.json();
+        if (!response.ok) throw Object.assign(new Error(data.error || 'Server request failed.'), {status:response.status});
+        return data;
+    }
+
+    function showGenerationState(track, label, message, canRecover=false) {
+        const card=document.getElementById(track.cardId);if(!card)return;
+        let panel=card.querySelector('.generation-state');
+        if(!panel){panel=document.createElement('div');panel.className='generation-state';panel.style.cssText='font-size:12px;color:var(--accent-cyan);padding:8px 0;max-width:260px';panel.setAttribute('role','status');card.append(panel);}
+        if(label==='Needs attention')card.classList.remove('is-cooking');
+        if(label==='Creating'||label==='Checking song')card.classList.add('is-cooking');
+        panel.replaceChildren();
+        const heading=document.createElement('strong');heading.textContent=label;panel.append(heading);
+        if(message){const detail=document.createElement('div');detail.style.color='var(--text-muted)';detail.textContent=message;panel.append(detail);}
+        if(label==='Needs attention'){
+            const button=document.createElement('button');button.className='filter-btn';button.type='button';
+            button.textContent=canRecover?'Recover song':'View recovery details';
+            button.onclick=async event=>{event.stopPropagation();button.disabled=true;try{
+                if(canRecover){await fetchJSON('/credits/retry-save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jobId:track.jobId})});showGenerationState(track,'Checking song','Checking the existing generation. No new song is being requested.');}
+                else await showCreditHistory();
+            }catch(error){alert(error.message);}finally{button.disabled=false;}};panel.append(button);
+        }
+    }
+    async function monitorBatch() {
+        if (!pendingBatch) return;
+        setBusy(true);
+        const status = document.getElementById('status-info');
+        let networkError = false;
+        for (const track of pendingBatch.tracks) {
+            if (track.settled) continue;
+            try {
+                const state = await fetchJSON('/status-check?id=' + encodeURIComponent(track.jobId));
+                if (state.status === 'ready') {
+                    upgradePlaceholderToActiveTrack(track.cardId, track.url, track.title, pendingBatch.prompt);
+                    track.settled = true;
+                    track.success = true;
+                    showGenerationState(track,'Ready','');
+                    await refreshCredits().catch(()=>{});
+                    persistBatch();
+                } else if (state.status === 'attention') {
+                    networkError = true;
+                    showGenerationState(track,'Needs attention',state.error, state.canRecover);
+                    status.textContent = state.error + ' Open Credit history.';
+                } else if (state.status === 'cooking') {
+                    showGenerationState(track,'Creating','Your song is processing. It will appear here when saved.');
+                } else if (state.status === 'failed' || state.status === 'unknown') {
+                    track.settled = true;
+                    track.success = false;
+                    track.error = state.error || 'This job could not be recovered after a server restart.';
+                    const card = document.getElementById(track.cardId);
+                    if (card) {
+                        card.setAttribute('data-failed', 'true');
+                        card.querySelector('.card-title').textContent = (card.getAttribute('data-custom-title') || track.title) + ' — failed';
+                        card.querySelector('.card-style').textContent = track.error;
+                        card.classList.remove('is-cooking');
+                        bindCardEvents(card);
+                        card.querySelector('.card-actions').replaceChildren();
+                    }
+                    showGenerationState(track,state.status==='unknown'?'Needs attention':'Failed',state.status==='unknown'?track.error:'This song was not charged.');
+                    persistBatch();
+                }
+            } catch (error) {
+                networkError = true;
+                showGenerationState(track,'Reconnecting','Checking will resume automatically. Your song may still be processing on the server.');
+                status.textContent = 'Connection interrupted. Checking again automatically; your songs may still be processing.';
+            }
+        }
+        await refreshCredits().catch(()=>{});
+        if (pendingBatch.tracks.every(track => track.settled)) {
+            const successes = pendingBatch.tracks.filter(track => track.success).length;
+            status.textContent = successes + ' of 2 tracks saved. ' +
+                (successes === 2 ? 'Select a track to play.' : 'Failed tracks were not charged. You can try again.');
+            pendingBatch = null;
+            persistBatch();
+            setBusy(false);
+        } else {
+            if (!networkError) status.textContent = 'Creating complete songs… Waiting for each audio file to be saved. You can refresh safely.';
+            setTimeout(monitorBatch, 3000);
         }
     }
 
     async function generateMusic() {
-        const titleInput = document.getElementById('trackTitle').value.trim();
-        const prompt = document.getElementById('prompt').value.trim();
+        if (generationBusy) return;
+        const title = document.getElementById('trackTitle').value.trim();
+        const promptInput = document.getElementById('prompt').value.trim();
         const lyrics = document.getElementById('lyrics').value.trim();
+        const exclusions = document.getElementById('exclusions').value.trim();
+        if (tokensAvailable < 10 && !generationRequest) return alert('Not enough available credits for two songs.');
+        const problem = inputLimitError();
+        if (!title || problem) return alert(problem || 'Enter a song title.');
+        setBusy(true);
         const status = document.getElementById('status-info');
-        const loader = document.getElementById('loader');
-        const audioPlayer = document.getElementById('audioPlayer');
-        const btn = document.getElementById('genBtn');
-        const grid = document.getElementById('tracksGrid');
-        const pTitle = document.getElementById('pTitle');
-        const pStatus = document.getElementById('pStatus');
-
-        if (!titleInput || !prompt || !lyrics) return alert("Fields cannot be blank!");
-        
-        btn.disabled = true;
-        document.getElementById('trackTitle').disabled = true;
-        loader.style.display = 'block';
-        status.innerText = "🎙️ Optimizing acoustic arrays... Please wait.";
-
+        status.textContent = 'Submitting your tracks…';
+        const structuredPrompt = buildStylePrompt();
+        // Capture before waiting: edits made during generation must not change this snapshot.
+        const creationSettings = {
+            version: 1, title, style: promptInput, lyrics, exclusions,
+            vocal: currentVocalProfile, tier: currentTier, submittedPrompt: structuredPrompt
+        };
         try {
-            const response = await fetch('/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt, lyrics })
+            generationRequest ||= {requestId:crypto.randomUUID(),prompt:structuredPrompt,lyrics,vocalProfile:creationSettings.vocal,settings:creationSettings,folder:activeFolderView};
+            sessionStorage.setItem('muse_generation_'+MuseAuth.user.id,JSON.stringify(generationRequest));
+            const data = await fetchJSON('/generate', {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify(generationRequest || (generationRequest = {requestId:crypto.randomUUID(),prompt:structuredPrompt,lyrics,vocalProfile:creationSettings.vocal,settings:creationSettings,folder:activeFolderView}))
             });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || "Failed");
-            
-            audioPlayer.src = data.audioUrl;
-            pTitle.innerText = titleInput; pStatus.innerText = "Ready to Play";
-            status.innerHTML = "🎉 Master compilation ready for playback!"; audioPlayer.play();
-            
-            const uniqueId = "track-" + Date.now();
-            const card = document.createElement('div'); 
-            card.className = 'track-card';
-            card.id = uniqueId;
-            card.setAttribute('data-audio-src', data.audioUrl);
-            card.setAttribute('data-track-title', titleInput);
-            bindCardEvents(card);
-            
-            card.innerHTML = `
-                <div class="card-wave-art"><div class="card-wave-bars"><div class="wave-bar"></div><div class="wave-bar" style="height:20px;"></div><div class="wave-bar"></div></div></div>
-                <div class="card-details">
-                    <div class="card-title">🔊 ${titleInput}</div>
-                    <div class="card-style">${prompt.substring(0, 40)}...</div>
-                </div>
-                <div class="card-actions">
-                    <a href="${data.audioUrl}" download="${titleInput}.mp3" class="action-icon-btn" onclick="event.stopPropagation();">💾 Download</a>
-                    <button id="btn-lib-${uniqueId}" class="action-icon-btn" onclick="toggleWorkspace(event, '${uniqueId}')">📁 Add to Lib</button>
-                    <button class="action-icon-btn" onclick="shareTrack(event, '${data.audioUrl}')">🔗 Share</button>
-                </div>
-            `;
-            grid.insertBefore(card, grid.firstChild);
-            saveCurrentLibraryState();
-            showAllTracks();
-        } catch (err) { status.innerText = "❌ Matrix Fault: " + err.message; } finally { 
-            loader.style.display = 'none'; 
-            validateFormTitle();
+            generationRequest = null;
+            sessionStorage.removeItem('muse_generation_'+MuseAuth.user.id);
+            await refreshCredits().catch(()=>{});
+            pendingBatch = {prompt: data.settings.style, settings: data.settings, tracks: ['A','B'].map(label => ({
+                jobId: data['trackId' + label], url: data['fileUrl' + label],
+                cardId: 'card-' + data['trackId' + label],
+                title: data.settings.title + ' (Variant ' + label + ')', label, settled: false
+            }))};
+            for (const track of pendingBatch.tracks) {
+                if(!document.getElementById(track.cardId))createOptimisticPlaceholderCard(data.settings.title, 'Variant ' + track.label, data.settings.style, track.cardId);
+            }
+            filterTracksByActiveFolder();
+            persistBatch();
+            await monitorBatch();
+        } catch (error) {
+            if(error.status && error.status < 500){generationRequest = null;sessionStorage.removeItem('muse_generation_'+MuseAuth.user.id);}
+            status.textContent = error.message + (generationRequest?' Click Create again to retry the original request safely. Your original song settings will be used.':' Nothing new will be submitted automatically.');
+            if (!pendingBatch) setBusy(false);
         }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-        loadSavedLibraryAndInputs();
+    window.addEventListener('DOMContentLoaded', async () => {
+        if (!await MuseAuth.init()) return;
+        if (!await libraryStorage.init()) return;
+        try{generationRequest=JSON.parse(sessionStorage.getItem('muse_generation_'+MuseAuth.user.id)||'null');}catch{}
+        initialisePlaybackControls();
+        initialiseLibraryControls();
+        try {
+            loadSavedLibraryAndInputs();
+            const savedVocal = libraryStorage.getItem('muse_ai_draft_vocal');
+            const savedTier = libraryStorage.getItem('muse_ai_draft_tier');
+            if (savedVocal !== null) setVocalProfile(savedVocal);
+            if (['simple','pro','master'].includes(savedTier)) setTier(savedTier);
+            const snapshot = JSON.parse(libraryStorage.getItem('muse_ai_job_snapshot') || 'null');
+            if (snapshot) {
+                pendingBatch = snapshot.batch;
+
+            }
+            await refreshCredits();
+            const recovered = (await fetchJSON('/generation/latest')).batch;
+            if(recovered?.requestId===generationRequest?.requestId){generationRequest=null;sessionStorage.removeItem('muse_generation_'+MuseAuth.user.id);}
+            if(recovered && (recovered.tracks.some(t=>!['ready','failed'].includes(t.state)) || recovered.tracks.some(t=>!document.getElementById(t.cardId) || document.getElementById(t.cardId).classList.contains('is-cooking')))) {
+                pendingBatch = {prompt:recovered.settings.style,settings:recovered.settings,tracks:recovered.tracks.map(t=>({...t,settled:false}))};
+            }
+            // Never restore old cosmetic mastering labels as evidence of completion.
+            document.querySelectorAll('.mastering-badge').forEach(el => el.remove());
+            if (pendingBatch) {
+                for (const track of pendingBatch.tracks) {
+                    if (track.hidden) continue;
+                    if (!document.getElementById(track.cardId)) {
+                        createOptimisticPlaceholderCard(pendingBatch.settings?.title || track.title, 'Variant '+track.label, pendingBatch.prompt, track.cardId);
+                        const restoredCard=document.getElementById(track.cardId);
+                        if(recovered?.folder && customFolders.includes(recovered.folder))restoredCard.setAttribute('data-assigned-folder',recovered.folder);
+                    }
+                    if (pendingBatch.settings) document.getElementById(track.cardId)?.setAttribute('data-creation-settings', JSON.stringify(pendingBatch.settings));
+                    if (track.success) upgradePlaceholderToActiveTrack(track.cardId, track.url, track.title, pendingBatch.prompt);
+                }
+                monitorBatch();
+            } else {
+                document.querySelectorAll('.track-card.is-cooking').forEach(card => {
+                    card.setAttribute('data-unrecoverable', 'true');
+                    card.querySelector('.card-style').textContent = 'Older unfinished job. Its status cannot be recovered.';
+                });
+            }
+        } catch (error) {
+            document.getElementById('libraryLoadingText').textContent = 'Some saved library data could not be loaded. It has not been overwritten. Please ask for help restoring a backup.';
+            document.getElementById('retryLibraryLoad').hidden = false;
+            return;
+        }
+        ['trackTitle', 'prompt', 'lyrics', 'exclusions'].forEach(id => {
+            const key = id === 'trackTitle' ? 'title' : id;
+            document.getElementById(id).addEventListener('input', event =>
+                libraryStorage.setItem('muse_ai_draft_' + key, event.target.value));
+            document.getElementById(id).addEventListener('input', validateFormTitle);
+        });
         validateFormTitle();
-        
-        document.getElementById('trackTitle').addEventListener('input', (e) => localStorage.setItem('muse_ai_draft_title', e.target.value));
-        document.getElementById('prompt').addEventListener('input', (e) => localStorage.setItem('muse_ai_draft_prompt', e.target.value));
-        document.getElementById('lyrics').addEventListener('input', (e) => localStorage.setItem('muse_ai_draft_lyrics', e.target.value));
+        saveCurrentLibraryState();
+        libraryStorage.finish();
     });
 </script>
 </body>
